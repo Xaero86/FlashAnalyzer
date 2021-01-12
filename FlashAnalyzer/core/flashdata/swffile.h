@@ -16,19 +16,16 @@ public:
     virtual ~SWFFile();
     
     inline bool valid() const {return _valid;}
-    
-    Tag::iterator begin() { return _tags.begin(); }
-    Tag::iterator end() { return _tags.end(); }
-    Tag::const_iterator begin() const { return _tags.begin(); }
-    Tag::const_iterator end() const { return _tags.end(); }
-    Tag::const_iterator cbegin() const { return _tags.cbegin(); }
-    Tag::const_iterator cend() const { return _tags.cend(); }
+
+	Tag::tags_t& tags() {return _tags;}
     
     std::string toString() const;
     
-    FileAttributesTag* fileAttributesTag() const {return _fileAttributesTag;}
-    JPEGTablesTag* jpegTablesTag() const {return _jpegTablesTag;}
-    DefinitionTag* getDefinitionTag(uint16_t charactedId) const;
+	FileAttributesTag* fileAttributesTag() const {return _fileAttributesTag;}
+	JPEGTablesTag* jpegTablesTag() const {return _jpegTablesTag;}
+
+	const char* data() const {return _data;}
+	uint32_t dataSize() const {return _dataSize;}
     
 private:
     enum CompressType
@@ -52,8 +49,8 @@ private:
     uint32_t            _dataSize;
     char*               _data;
     Tag::tags_t         _tags;
-    FileAttributesTag*  _fileAttributesTag;
-    JPEGTablesTag*      _jpegTablesTag;
+	FileAttributesTag*  _fileAttributesTag;
+	JPEGTablesTag*      _jpegTablesTag;
 };
 
 #endif // SWFFILE_H

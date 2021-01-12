@@ -1,6 +1,6 @@
 #include "fileattributestag.h"
 
-#include <iostream>
+#include <sstream>
 
 FileAttributesTag::FileAttributesTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
  Tag(source, FILE_ATTRIBUTES_TAG, headerLength, dataLength),
@@ -17,10 +17,20 @@ FileAttributesTag::FileAttributesTag(const char* source, uint32_t headerLength, 
     _useNetwork = ((data & 0x1) == 0x1);
 }
 
-void FileAttributesTag::print() const
+std::string FileAttributesTag::tagType() const
 {
-    std::cout << "FileAttributesTag valid : " << valid() << std::endl;
-    std::cout << "FileAttributesTag code: " << code() << std::endl;
-    std::cout << "FileAttributesTag dataLength: " << dataLength() << std::endl;
-    std::cout << "FileAttributesTag totalLength: " << totalLength() << std::endl;
+	return "FileAttributes";
+}
+
+std::string FileAttributesTag::tagDescription() const
+{
+	std::stringstream description;
+
+	description << Tag::tagDescription();
+	description << "Has metadata: " << _hasMetaData << std::endl;
+	description << "Has AS3: " << _hasAS3 << std::endl;
+	description << "No cress domain cache: " << _noCrossDomainCache << std::endl;
+	description << "Use network: " << _useNetwork << std::endl;
+
+	return description.str();
 }

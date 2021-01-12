@@ -12,8 +12,9 @@ public:
     bool hasAS3() const {return _hasAS3;}
     bool noCrossDomainCache() const {return _noCrossDomainCache;}
     bool useNetwork() const {return _useNetwork;}
-    
-    void print() const;
+
+	std::string tagType() const;
+	std::string tagDescription() const;
     
 private:
     bool   _hasMetaData;

@@ -7,8 +7,6 @@
 #include <streambuf>
 #include <string>
 
-using namespace std;
-
 class TextEditSteamBuf;
 class TeeStreamBuf;
 

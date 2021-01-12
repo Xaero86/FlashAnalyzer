@@ -1,7 +1,5 @@
 #include "definebuttontag.h"
 
-#include <iostream>
-
 #include "tools.h"
 
 DefineButtonTag::DefineButtonTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
@@ -9,13 +7,14 @@ DefineButtonTag::DefineButtonTag(const char* source, uint32_t headerLength, uint
 {
     uint32_t currentIndex = headerLength;
     _uid = readUnsigned16(&_rawData[currentIndex]);
-    currentIndex += sizeof(_uid);
 }
 
-void DefineButtonTag::print() const
+std::string DefineButtonTag::tagType() const
 {
-    std::cout << "DefineButtonTag valid : " << valid() << std::endl;
-    std::cout << "DefineButtonTag code: " << code() << std::endl;
-    std::cout << "DefineButtonTag dataLength: " << dataLength() << std::endl;
-    std::cout << "DefineButtonTag totalLength: " << totalLength() << std::endl;
+	return "DefineButton";
+}
+
+std::string DefineButtonTag::tagDescription() const
+{
+	return Tag::tagDescription();
 }

@@ -8,8 +8,9 @@ class SetBackgroundColorTag : public ControlTag
 {
 public:
     SetBackgroundColorTag(const char* source, uint32_t headerLength, uint32_t dataLength);
-    
-    void print() const;
+
+	std::string tagType() const;
+	std::string tagDescription() const;
         
 private:
     RGBRecord  _color;

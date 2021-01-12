@@ -155,32 +155,31 @@ SWFFile::SWFFile(std::string fileName) :
     // Frame count
     _frameCount = readUnsigned16(&_data[currentReadIndex]);
     currentReadIndex += sizeof(_frameCount);
-    
-    Tag* newTag = nullptr;
-    
+
+	Tag* newTag = nullptr;
+
     while (_dataSize > currentReadIndex)
     {
-        newTag = Tag::CreateTag(&_data[currentReadIndex], _dataSize-currentReadIndex, this);
-        if ((newTag != nullptr) && (newTag->totalLength() > 0) && newTag->valid())
-        {
-            _tags.push_back(newTag);
-            currentReadIndex += newTag->totalLength();
+		newTag = Tag::AddNextTag(&_data[currentReadIndex], _dataSize-currentReadIndex, _tags);
+		if ((newTag != nullptr) && (newTag->totalLength() > 0) && newTag->valid())
+		{
+			currentReadIndex += newTag->totalLength();
             
-            if (newTag->code() == FILE_ATTRIBUTES_TAG)
+			if (newTag->code() == FILE_ATTRIBUTES_TAG)
             {
                 if (_tags.size() != 1)
                 {
                     std::cerr << "Warning: file attibutes tag is not locate at the beginning" << std::endl;
                 }
-                _fileAttributesTag = (FileAttributesTag*) newTag;
+				_fileAttributesTag = (FileAttributesTag*) &newTag;
             }
-            else if (newTag->code() == JPEG_TABLES_TAG)
+			else if (newTag->code() == JPEG_TABLES_TAG)
             {
                 if (_jpegTablesTag != nullptr)
                 {
                     std::cerr << "Warning: only one JPEG table tag is allowed" << std::endl;
                 }
-                _jpegTablesTag = (JPEGTablesTag*) newTag;
+				_jpegTablesTag = (JPEGTablesTag*) &newTag;
             }
         }
         else
@@ -216,7 +215,7 @@ std::string SWFFile::toString() const
     return result.str();
 }
 
-DefinitionTag* SWFFile::getDefinitionTag(uint16_t charactedId) const
+/*DefinitionTag* SWFFile::getDefinitionTag(uint16_t charactedId) const
 {
     DefinitionTag* result = nullptr;
     for (Tag::const_iterator itTag = cbegin(); itTag != cend(); ++itTag)
@@ -228,4 +227,4 @@ DefinitionTag* SWFFile::getDefinitionTag(uint16_t charactedId) const
         }
     }
     return nullptr;
-}
+}*/

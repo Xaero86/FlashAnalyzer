@@ -1,7 +1,5 @@
 #include "removeobjecttag.h"
 
-#include <iostream>
-
 #include "tools.h"
 
 RemoveObjectTag::RemoveObjectTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
@@ -12,14 +10,15 @@ RemoveObjectTag::RemoveObjectTag(const char* source, uint32_t headerLength, uint
     uint32_t currentIndex = headerLength;
     _characterId = readUnsigned16(&_rawData[currentIndex]);
     currentIndex += sizeof(_characterId);
-    _depth = readUnsigned16(&_rawData[currentIndex]);
-    currentIndex += sizeof(_depth);
+	_depth = readUnsigned16(&_rawData[currentIndex]);
 }
 
-void RemoveObjectTag::print() const
+std::string RemoveObjectTag::tagType() const
 {
-    std::cout << "RemoveObjectTag valid : " << valid() << std::endl;
-    std::cout << "RemoveObjectTag code: " << code() << std::endl;
-    std::cout << "RemoveObjectTag dataLength: " << dataLength() << std::endl;
-    std::cout << "RemoveObjectTag totalLength: " << totalLength() << std::endl;
+	return "RemoveObject";
+}
+
+std::string RemoveObjectTag::tagDescription() const
+{
+	return Tag::tagDescription();
 }

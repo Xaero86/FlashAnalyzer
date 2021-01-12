@@ -7,12 +7,9 @@ class DefineButtonTag : public DefinitionTag
 {
 public:
     DefineButtonTag(const char* source, uint32_t headerLength, uint32_t dataLength);
-    
-    void print() const;
-    
-private:
-    // ButtonRecord *
-    // ActionRecord * //TODO
+
+	std::string tagType() const;
+	std::string tagDescription() const;
 };
 
 #endif // DEFINEBUTTONTAG_H

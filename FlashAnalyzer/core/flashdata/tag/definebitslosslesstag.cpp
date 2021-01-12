@@ -1,8 +1,7 @@
 #include "definebitslosslesstag.h"
 
-#include <iostream>
+#include <sstream>
 #include <cstring>
-//#include "zlib.h"
 #include <QtZlib/zlib.h>
 
 #include "tools.h"
@@ -174,10 +173,31 @@ DefineBitsLosslessTag::DefineBitsLosslessTag(const char* source, uint32_t header
     _imageDataSize = _bitmapDataSize;
 }
 
-void DefineBitsLosslessTag::print() const
+DefineBitsLosslessTag::~DefineBitsLosslessTag()
 {
-    std::cout << "DefineBitsLosslessTag valid : " << valid() << std::endl;
-    std::cout << "DefineBitsLosslessTag code: " << code() << std::endl;
-    std::cout << "DefineBitsLosslessTag dataLength: " << dataLength() << std::endl;
-    std::cout << "DefineBitsLosslessTag totalLength: " << totalLength() << std::endl;
+	if (_bitmapData != nullptr)
+	{
+		delete[] _bitmapData;
+	}
+	if (_unzipData != nullptr)
+	{
+		delete[] _unzipData;
+	}
+}
+
+std::string DefineBitsLosslessTag::tagType() const
+{
+	return "DefineBitsLossless";
+}
+
+std::string DefineBitsLosslessTag::tagDescription() const
+{
+	std::stringstream description;
+
+	description << Tag::tagDescription();
+	description << "Color depth: " << _bitmapFormat << std::endl;
+	description << "Width: " << _bitmapWidth << std::endl;
+	description << "Height: " << _bitmapHeight << std::endl;
+
+	return description.str();
 }

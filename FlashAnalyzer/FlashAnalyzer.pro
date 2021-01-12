@@ -81,8 +81,13 @@ SOURCES += \
     core/flashdata/tag/videoframetag.cpp \
     core/flashdata/tools.cpp \
     main.cpp \
+    ui/extractablemodel.cpp \
+    ui/extractableview.cpp \
+    ui/imagepreview.cpp \
 	ui/mainwindow.cpp \
-	ui/loggerconsole.cpp
+	ui/loggerconsole.cpp \
+    ui/rawdatawidget.cpp \
+    ui/tagsmodel.cpp
 
 HEADERS += \
     core/flashdata/datatypes.h \
@@ -157,8 +162,13 @@ HEADERS += \
     core/flashdata/tag/tag.h \
     core/flashdata/tag/videoframetag.h \
     core/flashdata/tools.h \
+    ui/extractablemodel.h \
+    ui/extractableview.h \
+    ui/imagepreview.h \
     ui/mainwindow.h \
-	ui/loggerconsole.h
+	ui/loggerconsole.h \
+    ui/rawdatawidget.h \
+    ui/tagsmodel.h
 
 INCLUDEPATH = $$PWD/ui $$PWD/core $$PWD/core/flashdata $$PWD/core/flashdata/tag/
 

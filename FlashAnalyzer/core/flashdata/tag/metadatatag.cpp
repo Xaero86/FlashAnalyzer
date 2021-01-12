@@ -1,16 +1,16 @@
 #include "metadatatag.h"
 
-#include <iostream>
-
 MetadataTag::MetadataTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
  Tag(source, METADATA_TAG, headerLength, dataLength)
 {
 }
 
-void MetadataTag::print() const
+std::string MetadataTag::tagType() const
 {
-    std::cout << "MetadataTag valid : " << valid() << std::endl;
-    std::cout << "MetadataTag code: " << code() << std::endl;
-    std::cout << "MetadataTag dataLength: " << dataLength() << std::endl;
-    std::cout << "MetadataTag totalLength: " << totalLength() << std::endl;
+	return "Metadata";
+}
+
+std::string MetadataTag::tagDescription() const
+{
+	return Tag::tagDescription();
 }

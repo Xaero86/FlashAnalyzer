@@ -7,8 +7,9 @@ class DefineShape3Tag : public Tag
 {
 public:
     DefineShape3Tag(const char* source, uint32_t headerLength, uint32_t dataLength);
-    
-    void print() const;
+
+	std::string tagType() const;
+	std::string tagDescription() const;
 };
 
 #endif // DEFINESHAPE3TAG_H

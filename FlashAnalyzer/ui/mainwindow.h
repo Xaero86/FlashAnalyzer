@@ -3,7 +3,12 @@
 
 #include <QMainWindow>
 
+#include "tagsmodel.h"
+#include "extractablemodel.h"
+#include "extractableview.h"
 #include "loggerconsole.h"
+#include "rawdatawidget.h"
+#include "imagepreview.h"
 
 #include "swffile.h"
 
@@ -17,11 +22,24 @@ public:
 public slots:
 	void loadFile();
 	void closeFile();
+	void updateDescription(Tag* tag);
+	void openRawData();
+	void updatePreview(Tag* tag, QString& name);
+	void openPreview(int type);
 
 private:
-	QWidget*        _centralWidget;
+	QTabWidget*       _centralWidget;
+
+	TagsModel*        _tagsModel;
+	QTreeView*        _tagsWidget;
+	ExtractableModel* _extractableModel;
+	ExtractableView*  _extractableWidget;
 
 	LoggerConsole*  _loggerConsole;
+
+	QTextEdit*      _descriptionWidget;
+	RawDataWidget*  _rawDataWidget;
+	ImagePreview*   _imagePreview;
 
 	QAction*        _actionLoad;
 	QAction*        _actionClose;

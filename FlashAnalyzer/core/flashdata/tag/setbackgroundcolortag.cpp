@@ -1,7 +1,5 @@
 #include "setbackgroundcolortag.h"
 
-#include <iostream>
-
 SetBackgroundColorTag::SetBackgroundColorTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
  ControlTag(source, SET_BACKGROUND_COLOR_TAG, headerLength, dataLength),
  _color()
@@ -10,10 +8,12 @@ SetBackgroundColorTag::SetBackgroundColorTag(const char* source, uint32_t header
     _color.create(&_rawData[currentIndex], totalLength() - currentIndex);
 }
 
-void SetBackgroundColorTag::print() const
+std::string SetBackgroundColorTag::tagType() const
 {
-    std::cout << "SetBackgroundColorTag valid : " << valid() << std::endl;
-    std::cout << "SetBackgroundColorTag code: " << code() << std::endl;
-    std::cout << "SetBackgroundColorTag dataLength: " << dataLength() << std::endl;
-    std::cout << "SetBackgroundColorTag totalLength: " << totalLength() << std::endl;
+	return "SetBackgroundColor";
+}
+
+std::string SetBackgroundColorTag::tagDescription() const
+{
+	return Tag::tagDescription();
 }

@@ -1,10 +1,11 @@
 #include "definespritetag.h"
 
 #include <iostream>
+#include <sstream>
 
 #include "tools.h"
 
-DefineSpriteTag::DefineSpriteTag(const char* source, uint32_t headerLength, uint32_t dataLength, SWFFile* swfFile) :
+DefineSpriteTag::DefineSpriteTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
  DefinitionTag(source, DEFINE_SPRITE_TAG, headerLength, dataLength),
  _frameCount(0),
  _tags()
@@ -16,15 +17,15 @@ DefineSpriteTag::DefineSpriteTag(const char* source, uint32_t headerLength, uint
     _frameCount = readUnsigned16(&_rawData[currentIndex]);
     currentIndex += sizeof(_frameCount);
 
-    Tag* newTag = nullptr;
-    
+	Tag* newTag;
+
     while (dataLength > currentIndex)
     {
-        newTag = Tag::CreateTag(&_rawData[currentIndex], dataLength-currentIndex, swfFile);
-        if ((newTag != nullptr) && (newTag->totalLength() > 0) && newTag->valid())
-        {
-            _tags.push_back(newTag);
-            currentIndex += newTag->totalLength();
+		newTag = Tag::AddNextTag(&_rawData[currentIndex], dataLength-currentIndex, _tags);
+		if ((newTag->totalLength() > 0) && newTag->valid())
+		{
+			newTag->setParent(this);
+			currentIndex += newTag->totalLength();
         }
         else
         {
@@ -35,15 +36,17 @@ DefineSpriteTag::DefineSpriteTag(const char* source, uint32_t headerLength, uint
     }
 }
 
-void DefineSpriteTag::print() const
+std::string DefineSpriteTag::tagType() const
 {
-    std::cout << "DefineSpriteTag valid : " << valid() << std::endl;
-    std::cout << "DefineSpriteTag code: " << code() << std::endl;
-    std::cout << "DefineSpriteTag dataLength: " << dataLength() << std::endl;
-    std::cout << "DefineSpriteTag totalLength: " << totalLength() << std::endl;
+	return "DefineSprite";
+}
 
-    for (Tag::const_iterator itTag = _tags.cbegin(); itTag != _tags.cend(); ++itTag)
-    {
-        (*itTag)->print();
-    }
+std::string DefineSpriteTag::tagDescription() const
+{
+	std::stringstream description;
+
+	description << Tag::tagDescription();
+	description << "Number of tags: " << _tags.size() << std::endl;
+
+	return description.str();
 }

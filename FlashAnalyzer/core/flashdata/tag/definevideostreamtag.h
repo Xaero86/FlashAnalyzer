@@ -56,8 +56,9 @@ public:
     
     void setFrame(VideoFrameTag* frame, uint16_t index);
     VideoFrameTag* getFrame(uint16_t index) const;
-    
-    void print() const;
+
+	std::string tagType() const;
+	std::string tagDescription() const;
     
 private:
     uint16_t        _numFrames;

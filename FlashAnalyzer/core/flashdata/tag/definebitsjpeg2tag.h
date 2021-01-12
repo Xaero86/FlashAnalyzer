@@ -7,8 +7,9 @@ class DefineBitsJPEG2Tag : public ImageTag
 {
 public:
     DefineBitsJPEG2Tag(const char* source, uint32_t headerLength, uint32_t dataLength);
-    
-    void print() const;
+
+	std::string tagType() const;
+	std::string tagDescription() const;
 };
 
 #endif // DEFINEBITSJPEG2TAG_H

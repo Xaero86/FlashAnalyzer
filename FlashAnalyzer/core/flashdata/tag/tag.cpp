@@ -1,6 +1,7 @@
 #include "tag.h"
 
 #include <iostream>
+#include <sstream>
 
 #include "tools.h"
 
@@ -70,16 +71,15 @@
 #include "definefont4tag.h"
 #include "enabletelemetrytag.h"
 
-Tag* Tag::CreateTag(const char* source, uint32_t dataMax, SWFFile* swfFile)
+Tag *Tag::AddNextTag(const char* source, uint32_t dataMax, tags_t &tags)
 {
-    Tag* newTag = nullptr;
     uint16_t header = 0;
     
     if (dataMax < sizeof(header))
     {
         // not enough data available
         std::cerr << "Error parsing tag header" << std::endl;
-        return newTag;
+		return nullptr;
     }
     header = readUnsigned16(source);
     
@@ -93,214 +93,214 @@ Tag* Tag::CreateTag(const char* source, uint32_t dataMax, SWFFile* swfFile)
         {
             // not enough data available
             std::cerr << "Error parsing tag header" << std::endl;
-            return newTag;
+			return nullptr;
         }
         dataLength = readUnsigned32(&source[sizeof(header)]);
-        headerLength += sizeof(dataLength);
+		headerLength += sizeof(dataLength);
     }
     
     switch (code)
     {
         case END_TAG:
-            newTag = new EndTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<EndTag>(new EndTag(source, headerLength, dataLength)));
             break;
         case SHOW_FRAME_TAG:
-            newTag = new ShowFrameTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<ShowFrameTag>(new ShowFrameTag(source, headerLength, dataLength)));
             break;
         case DEFINE_SHAPE_TAG:
-            newTag = new DefineShapeTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineShapeTag>(new DefineShapeTag(source, headerLength, dataLength)));
             break;
         case PLACE_OBJECT_TAG:
-            newTag = new PlaceObjectTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<PlaceObjectTag>(new PlaceObjectTag(source, headerLength, dataLength)));
             break;
         case REMOVE_OBJECT_TAG:
-            newTag = new RemoveObjectTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<RemoveObjectTag>(new RemoveObjectTag(source, headerLength, dataLength)));
             break;
         case DEFINE_BITS_TAG:
-            newTag = new DefineBitsTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineBitsTag>(new DefineBitsTag(source, headerLength, dataLength)));
             break;
         case DEFINE_BUTTON_TAG:
-            newTag = new DefineButtonTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineButtonTag>(new DefineButtonTag(source, headerLength, dataLength)));
             break;
         case JPEG_TABLES_TAG:
-            newTag = new JPEGTablesTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<JPEGTablesTag>(new JPEGTablesTag(source, headerLength, dataLength)));
             break;
         case SET_BACKGROUND_COLOR_TAG:
-            newTag = new SetBackgroundColorTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<SetBackgroundColorTag>(new SetBackgroundColorTag(source, headerLength, dataLength)));
             break;
         case DEFINE_FONT_TAG:
-            newTag = new DefineFontTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineFontTag>(new DefineFontTag(source, headerLength, dataLength)));
             break;
         case DEFINE_TEXT_TAG:
-            newTag = new DefineTextTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineTextTag>(new DefineTextTag(source, headerLength, dataLength)));
             break;
         case DO_ACTION_TAG:
-            newTag = new DoActionTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DoActionTag>(new DoActionTag(source, headerLength, dataLength)));
             break;
         case DEFINE_FONT_INFO_TAG:
-            newTag = new DefineFontInfoTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineFontInfoTag>(new DefineFontInfoTag(source, headerLength, dataLength)));
             break;
         case DEFINE_SOUND_TAG:
-            newTag = new DefineSoundTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineSoundTag>(new DefineSoundTag(source, headerLength, dataLength)));
             break;
         case START_SOUND_TAG:
-            newTag = new StartSoundTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<StartSoundTag>(new StartSoundTag(source, headerLength, dataLength)));
             break;
         case DEFINE_BUTTON_SOUND_TAG:
-            newTag = new DefineButtonSoundTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineButtonSoundTag>(new DefineButtonSoundTag(source, headerLength, dataLength)));
             break;
         case SOUND_STREAM_HEAD_TAG:
-            newTag = new SoundStreamHeadTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<SoundStreamHeadTag>(new SoundStreamHeadTag(source, headerLength, dataLength)));
             break;
         case SOUND_STREAM_BLOCK_TAG:
-            newTag = new SoundStreamBlockTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<SoundStreamBlockTag>(new SoundStreamBlockTag(source, headerLength, dataLength)));
             break;
         case DEFINE_BITS_LOSSLESS_TAG:
-            newTag = new DefineBitsLosslessTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineBitsLosslessTag>(new DefineBitsLosslessTag(source, headerLength, dataLength)));
             break;
         case DEFINE_BITS_JPEG_2_TAG:
-            newTag = new DefineBitsJPEG2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineBitsJPEG2Tag>(new DefineBitsJPEG2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_SHAPE_2_TAG:
-            newTag = new DefineShape2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineShape2Tag>(new DefineShape2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_BUTTON_CXFORM_TAG:
-            newTag = new DefineButtonCxformTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineButtonCxformTag>(new DefineButtonCxformTag(source, headerLength, dataLength)));
             break;
         case PROTECT_TAG:
-            newTag = new ProtectTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<ProtectTag>(new ProtectTag(source, headerLength, dataLength)));
             break;
         case PLACE_OBJECT_2_TAG:
-            newTag = new PlaceObject2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<PlaceObject2Tag>(new PlaceObject2Tag(source, headerLength, dataLength)));
             break;
         case REMOVE_OBJECT_2_TAG:
-            newTag = new RemoveObject2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<RemoveObject2Tag>(new RemoveObject2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_SHAPE_3_TAG:
-            newTag = new DefineShape3Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineShape3Tag>(new DefineShape3Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_TEXT_2_TAG:
-            newTag = new DefineText2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineText2Tag>(new DefineText2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_BUTTON_2_TAG:
-            newTag = new DefineButton2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineButton2Tag>(new DefineButton2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_BITS_JPEG_3_TAG:
-            newTag = new DefineBitsJPEG3Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineBitsJPEG3Tag>(new DefineBitsJPEG3Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_BITS_LOSSLESS_2_TAG:
-            newTag = new DefineBitsLossless2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineBitsLossless2Tag>(new DefineBitsLossless2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_EDIT_TEXT_TAG:
-            newTag = new DefineEditTextTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineEditTextTag>(new DefineEditTextTag(source, headerLength, dataLength)));
             break;
         case DEFINE_SPRITE_TAG:
-            newTag = new DefineSpriteTag(source, headerLength, dataLength, swfFile);
+			tags.push_back(std::unique_ptr<DefineSpriteTag>(new DefineSpriteTag(source, headerLength, dataLength)));
             break;
         case FRAME_LABEL_TAG:
-            newTag = new FrameLabelTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<FrameLabelTag>(new FrameLabelTag(source, headerLength, dataLength)));
             break;
         case SOUND_STREAM_HEAD_2_TAG:
-            newTag = new SoundStreamHead2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<SoundStreamHead2Tag>(new SoundStreamHead2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_MORPH_SHAPE_TAG:
-            newTag = new DefineMorphShapeTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineMorphShapeTag>(new DefineMorphShapeTag(source, headerLength, dataLength)));
             break;
         case DEFINE_FONT_2_TAG:
-            newTag = new DefineFont2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineFont2Tag>(new DefineFont2Tag(source, headerLength, dataLength)));
             break;
         case EXPORT_ASSETS_TAG:
-            newTag = new ExportAssetsTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<ExportAssetsTag>(new ExportAssetsTag(source, headerLength, dataLength)));
             break;
         case IMPORT_ASSETS_TAG:
-            newTag = new ImportAssetsTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<ImportAssetsTag>(new ImportAssetsTag(source, headerLength, dataLength)));
             break;
         case ENABLE_DEBUGGER_TAG:
-            newTag = new EnableDebuggerTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<EnableDebuggerTag>(new EnableDebuggerTag(source, headerLength, dataLength)));
             break;
         case DO_INIT_ACTION_TAG:
-            newTag = new DoInitActionTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DoInitActionTag>(new DoInitActionTag(source, headerLength, dataLength)));
             break;
         case DEFINE_VIDEO_STREAM_TAG:
-            newTag = new DefineVideoStreamTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineVideoStreamTag>(new DefineVideoStreamTag(source, headerLength, dataLength)));
             break;
         case VIDEO_FRAME_TAG:
-            newTag = new VideoFrameTag(source, headerLength, dataLength, swfFile);
+			tags.push_back(std::unique_ptr<VideoFrameTag>(new VideoFrameTag(source, headerLength, dataLength)));
             break;
         case DEFINE_FONT_INFO_2_TAG:
-            newTag = new DefineFontInfo2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineFontInfo2Tag>(new DefineFontInfo2Tag(source, headerLength, dataLength)));
             break;
         case ENABLE_DEBUGGER_2_TAG:
-            newTag = new EnableDebugger2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<EnableDebugger2Tag>(new EnableDebugger2Tag(source, headerLength, dataLength)));
             break;
         case SCRIPT_LIMITS_TAG:
-            newTag = new ScriptLimitsTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<ScriptLimitsTag>(new ScriptLimitsTag(source, headerLength, dataLength)));
             break;
         case SET_TAB_INDEX_TAG:
-            newTag = new SetTabIndexTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<SetTabIndexTag>(new SetTabIndexTag(source, headerLength, dataLength)));
             break;
         case FILE_ATTRIBUTES_TAG:
-            newTag = new FileAttributesTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<FileAttributesTag>(new FileAttributesTag(source, headerLength, dataLength)));
             break;
         case PLACE_OBJECT_3_TAG:
-            newTag = new PlaceObject3Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<PlaceObject3Tag>(new PlaceObject3Tag(source, headerLength, dataLength)));
             break;
         case IMPORT_ASSETS_2_TAG:
-            newTag = new ImportAssets2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<ImportAssets2Tag>(new ImportAssets2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_FONT_ALIGN_ZONES_TAG:
-            newTag = new DefineFontAlignZonesTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineFontAlignZonesTag>(new DefineFontAlignZonesTag(source, headerLength, dataLength)));
             break;
         case CSM_TEXT_SETTINGS_TAG:
-            newTag = new CSMTextSettingsTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<CSMTextSettingsTag>(new CSMTextSettingsTag(source, headerLength, dataLength)));
             break;
         case DEFINE_FONT_3_TAG:
-            newTag = new DefineFont3Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineFont3Tag>(new DefineFont3Tag(source, headerLength, dataLength)));
             break;
         case SYMBOL_CLASS_TAG:
-            newTag = new SymbolClassTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<SymbolClassTag>(new SymbolClassTag(source, headerLength, dataLength)));
             break;
         case METADATA_TAG:
-            newTag = new MetadataTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<MetadataTag>(new MetadataTag(source, headerLength, dataLength)));
             break;
         case DEFINE_SCALING_GRID_TAG:
-            newTag = new DefineScalingGridTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineScalingGridTag>(new DefineScalingGridTag(source, headerLength, dataLength)));
             break;
         case DO_ABC_TAG:
-            newTag = new DoABCTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DoABCTag>(new DoABCTag(source, headerLength, dataLength)));
             break;
         case DEFINE_SHAPE_4_TAG:
-            newTag = new DefineShape4Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineShape4Tag>(new DefineShape4Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_MORPH_SHAPE_2_TAG:
-            newTag = new DefineMorphShape2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineMorphShape2Tag>(new DefineMorphShape2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_SCENE_AND_FRAME_LABEL_DATA_TAG:
-            newTag = new DefineSceneAndFrameLabelDataTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineSceneAndFrameLabelDataTag>(new DefineSceneAndFrameLabelDataTag(source, headerLength, dataLength)));
             break;
         case DEFINE_BINARY_DATA_TAG:
-            newTag = new DefineBinaryDataTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineBinaryDataTag>(new DefineBinaryDataTag(source, headerLength, dataLength)));
             break;
         case DEFINE_FONT_NAME_TAG:
-            newTag = new DefineFontNameTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineFontNameTag>(new DefineFontNameTag(source, headerLength, dataLength)));
             break;
         case START_SOUND_2_TAG:
-            newTag = new StartSound2Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<StartSound2Tag>(new StartSound2Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_BITS_JPEG_4_TAG:
-            newTag = new DefineBitsJPEG4Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineBitsJPEG4Tag>(new DefineBitsJPEG4Tag(source, headerLength, dataLength)));
             break;
         case DEFINE_FONT_4_TAG:
-            newTag = new DefineFont4Tag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<DefineFont4Tag>(new DefineFont4Tag(source, headerLength, dataLength)));
             break;
         case ENABLE_TELEMETRY_TAG:
-            newTag = new EnableTelemetryTag(source, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<EnableTelemetryTag>(new EnableTelemetryTag(source, headerLength, dataLength)));
             break;
         default:
-            newTag = new Tag(source, code, headerLength, dataLength);
+			tags.push_back(std::unique_ptr<Tag>(new Tag(source, code, headerLength, dataLength)));
             break;
     }
-    return newTag;
+	return tags.back().get();
 }
 
 Tag::Tag(const char* source, uint32_t code, uint32_t headerLength, uint32_t dataLength) :
@@ -308,13 +308,42 @@ Tag::Tag(const char* source, uint32_t code, uint32_t headerLength, uint32_t data
  _valid(true),
  _code(code),
  _headerLength(headerLength),
- _dataLength(dataLength)
+ _dataLength(dataLength),
+  _parent(nullptr)
 {}
 
-void Tag::print() const
+std::string Tag::tagType() const
 {
-    std::cout << "Unknown tag valid : " << _valid << std::endl;
-    std::cout << "Unknown tag code: " << _code << std::endl;
-    std::cout << "Unknown tag dataLength: " << dataLength() << std::endl;
-    std::cout << "Unknown tag totalLength: " << totalLength() << std::endl;
+	return "Unknown tag";
+}
+
+std::string Tag::tagDescription() const
+{
+	std::stringstream description;
+
+	description << "Valid: " << valid() << std::endl;
+	description << "Code: " << code() << std::endl;
+	description << "DataLength: " << dataLength() << std::endl;
+	description << "TotalLength: " << totalLength() << std::endl;
+
+	return description.str();
+}
+bool Tag::isImage() const
+{
+	return ((_code == DEFINE_BITS_TAG) ||
+			(_code == DEFINE_BITS_LOSSLESS_TAG) ||
+			(_code == DEFINE_BITS_JPEG_2_TAG) ||
+			(_code == DEFINE_BITS_JPEG_3_TAG) ||
+			(_code == DEFINE_BITS_LOSSLESS_2_TAG) ||
+			(_code == DEFINE_BITS_JPEG_4_TAG));
+}
+
+bool Tag::isVideo() const
+{
+	return (_code == DEFINE_VIDEO_STREAM_TAG);
+}
+
+bool Tag::isSound() const
+{
+	return (_code == DEFINE_SOUND_TAG);
 }

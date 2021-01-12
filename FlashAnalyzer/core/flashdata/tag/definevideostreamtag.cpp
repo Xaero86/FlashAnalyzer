@@ -1,6 +1,6 @@
 #include "definevideostreamtag.h"
 
-#include <iostream>
+#include <sstream>
 #include <cstring>
 
 #include "tools.h"
@@ -35,8 +35,7 @@ DefineVideoStreamTag::DefineVideoStreamTag(const char* source, uint32_t headerLe
     _smoothing = (flags & 0x01);
     
     _codecId = (CodecID) ((unsigned char) _rawData[currentIndex]);
-    currentIndex += sizeof(_codecId);
-    
+
     _frames = new VideoFrameTag*[_numFrames];
     std::fill_n(_frames, _numFrames, nullptr);
 }
@@ -61,10 +60,19 @@ VideoFrameTag* DefineVideoStreamTag::getFrame(uint16_t index) const
     }
 }
 
-void DefineVideoStreamTag::print() const
+std::string DefineVideoStreamTag::tagType() const
 {
-    std::cout << "DefineVideoStreamTag valid : " << valid() << std::endl;
-    std::cout << "DefineVideoStreamTag code: " << code() << std::endl;
-    std::cout << "DefineVideoStreamTag dataLength: " << dataLength() << std::endl;
-    std::cout << "DefineVideoStreamTag totalLength: " << totalLength() << std::endl;
+	return "DefineVideoStream";
+}
+
+std::string DefineVideoStreamTag::tagDescription() const
+{
+	std::stringstream description;
+
+	description << Tag::tagDescription();
+	description << "Number of frames: " << _numFrames << std::endl;
+	description << "Width: " << _width << std::endl;
+	description << "Height: " << _height << std::endl;
+
+	return description.str();
 }

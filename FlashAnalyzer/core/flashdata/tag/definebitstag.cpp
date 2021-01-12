@@ -1,6 +1,6 @@
 #include "definebitstag.h"
 
-#include <iostream>
+#include <sstream>
 
 #include "tools.h"
 
@@ -27,10 +27,17 @@ DefineBitsTag::DefineBitsTag(const char* source, uint32_t headerLength, uint32_t
     }
 }
 
-void DefineBitsTag::print() const
+std::string DefineBitsTag::tagType() const
 {
-    std::cout << "DefineBitsTag valid : " << valid() << std::endl;
-    std::cout << "DefineBitsTag code: " << code() << std::endl;
-    std::cout << "DefineBitsTag dataLength: " << dataLength() << std::endl;
-    std::cout << "DefineBitsTag totalLength: " << totalLength() << std::endl;
+	return "DefineBits";
+}
+
+std::string DefineBitsTag::tagDescription() const
+{
+	std::stringstream description;
+
+	description << Tag::tagDescription();
+	description << "Type: " << imageTypeExtension() << std::endl;
+
+	return description.str();
 }

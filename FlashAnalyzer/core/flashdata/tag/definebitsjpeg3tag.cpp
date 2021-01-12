@@ -1,6 +1,6 @@
 #include "definebitsjpeg3tag.h"
 
-#include <iostream>
+#include <sstream>
 
 #include "tools.h"
 
@@ -61,10 +61,17 @@ DefineBitsJPEG3Tag::DefineBitsJPEG3Tag(const char* source, uint32_t headerLength
     }
 }
 
-void DefineBitsJPEG3Tag::print() const
+std::string DefineBitsJPEG3Tag::tagType() const
 {
-    std::cout << "DefineBitsJPEG3Tag valid : " << valid() << std::endl;
-    std::cout << "DefineBitsJPEG3Tag code: " << code() << std::endl;
-    std::cout << "DefineBitsJPEG3Tag dataLength: " << dataLength() << std::endl;
-    std::cout << "DefineBitsJPEG3Tag totalLength: " << totalLength() << std::endl;
+	return "DefineBitsJPEG3";
+}
+
+std::string DefineBitsJPEG3Tag::tagDescription() const
+{
+	std::stringstream description;
+
+	description << Tag::tagDescription();
+	description << "Type: " << imageTypeExtension() << std::endl;
+
+	return description.str();
 }

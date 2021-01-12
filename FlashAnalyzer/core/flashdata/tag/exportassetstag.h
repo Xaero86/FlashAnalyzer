@@ -7,8 +7,9 @@ class ExportAssetsTag : public Tag
 {
 public:
     ExportAssetsTag(const char* source, uint32_t headerLength, uint32_t dataLength);
-    
-    void print() const;
+
+	std::string tagType() const;
+	std::string tagDescription() const;
 };
 
 #endif // EXPORTASSETSTAG_H

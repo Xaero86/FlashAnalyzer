@@ -6,12 +6,13 @@
 class VideoFrameTag : public Tag
 {
 public:
-    VideoFrameTag(const char* source, uint32_t headerLength, uint32_t dataLength, SWFFile* swfFile);
+	VideoFrameTag(const char* source, uint32_t headerLength, uint32_t dataLength);
     
     const char* videoData() {return _videoData;}
     uint32_t videoDataSize() {return _videoDataSize;}
-    
-    void print() const;
+
+	std::string tagType() const;
+	std::string tagDescription() const;
     
 private:
     uint16_t         _streamID;

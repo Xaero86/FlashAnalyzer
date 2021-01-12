@@ -7,8 +7,9 @@ class DefineBitsJPEG4Tag : public ImageTag
 {
 public:
     DefineBitsJPEG4Tag(const char* source, uint32_t headerLength, uint32_t dataLength);
-    
-    void print() const;
+
+	std::string tagType() const;
+	std::string tagDescription() const;
     
     const char* bitmapAlphaData() const {return _bitmapAlphaData;}
     uint32_t bitmapAlphaDataSize() const {return _bitmapAlphaDataSize;}

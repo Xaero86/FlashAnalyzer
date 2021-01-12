@@ -10,30 +10,39 @@ class SWFFile;
 class Tag
 {
 public:
-	//using tags_t = std::vector<std::unique_ptr<Tag>>;
-	using tags_t = std::vector<Tag*>;
-    using iterator = tags_t::iterator;
-    using const_iterator = tags_t::const_iterator;
-    
-    static Tag* CreateTag(const char* source, uint32_t dataMax, SWFFile* swfFile);
-    Tag(const char* source, uint32_t code, uint32_t headerLength, uint32_t dataLength);
-    
+	using tags_t = std::vector<std::unique_ptr<Tag>>;
+
+	static Tag* AddNextTag(const char* source, uint32_t dataMax, tags_t& tags);
+	Tag(const char* source, uint32_t code, uint32_t headerLength, uint32_t dataLength);
+
     inline bool valid() const {return _valid;}
     inline uint32_t code() const {return _code;}
     inline uint32_t headerLength() const {return _headerLength;}
     inline uint32_t dataLength() const {return _dataLength;}
     inline uint32_t totalLength() const {return _headerLength + _dataLength;}
-    
-    virtual void print() const;
-    
+
+	virtual std::string tagType() const;
+	virtual std::string tagDescription() const;
+
+	void setParent(Tag* parent) {_parent = parent;}
+	Tag* parent() const {return _parent;}
+
+	const char* data() const {return _rawData;}
+	uint32_t dataSize() const {return _dataLength;}
+
+	bool isImage() const;
+	bool isVideo() const;
+	bool isSound() const;
+
 protected:
     const char*   _rawData;
-    bool          _valid;
+	bool          _valid;
     
 private:
     uint32_t      _code;
     uint32_t      _headerLength;
     uint32_t      _dataLength;
+	Tag*          _parent;
 };
 
 #define END_TAG                               0  

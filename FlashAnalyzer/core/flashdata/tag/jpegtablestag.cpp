@@ -1,7 +1,5 @@
 #include "jpegtablestag.h"
 
-#include <iostream>
-
 JPEGTablesTag::JPEGTablesTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
  Tag(source, JPEG_TABLES_TAG, headerLength, dataLength),
  _jpegData(nullptr),
@@ -23,10 +21,12 @@ JPEGTablesTag::JPEGTablesTag(const char* source, uint32_t headerLength, uint32_t
     }
 }
 
-void JPEGTablesTag::print() const
+std::string JPEGTablesTag::tagType() const
 {
-    std::cout << "JPEGTablesTag valid : " << valid() << std::endl;
-    std::cout << "JPEGTablesTag code: " << code() << std::endl;
-    std::cout << "JPEGTablesTag dataLength: " << dataLength() << std::endl;
-    std::cout << "JPEGTablesTag totalLength: " << totalLength() << std::endl;
+	return "JPEGTables";
+}
+
+std::string JPEGTablesTag::tagDescription() const
+{
+	return Tag::tagDescription();
 }

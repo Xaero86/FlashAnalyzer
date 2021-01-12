@@ -7,8 +7,10 @@ class DefineBitsLossless2Tag : public ImageTag
 {
 public:
     DefineBitsLossless2Tag(const char* source, uint32_t headerLength, uint32_t dataLength);
-    
-    void print() const;
+	virtual ~DefineBitsLossless2Tag();
+
+	std::string tagType() const;
+	std::string tagDescription() const;
     
 private:
     BitmapFormat _bitmapFormat;

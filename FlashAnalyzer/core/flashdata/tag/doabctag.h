@@ -7,8 +7,9 @@ class DoABCTag : public Tag
 {
 public:
     DoABCTag(const char* source, uint32_t headerLength, uint32_t dataLength);
-    
-    void print() const;
+
+	std::string tagType() const;
+	std::string tagDescription() const;
 };
 
 #endif // DOABCTAG_H

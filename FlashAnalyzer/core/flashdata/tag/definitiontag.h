@@ -9,6 +9,9 @@ public:
     DefinitionTag(const char* source, uint32_t code, uint32_t headerLength, uint32_t dataLength);
     
     uint16_t uid() const {return _uid;}
+
+	virtual std::string tagType() const = 0;
+	virtual std::string tagDescription() const = 0;
     
 protected:
     uint16_t      _uid;

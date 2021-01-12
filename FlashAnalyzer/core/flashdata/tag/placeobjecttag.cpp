@@ -1,7 +1,5 @@
 #include "placeobjecttag.h"
 
-#include <iostream>
-
 #include "tools.h"
 
 PlaceObjectTag::PlaceObjectTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
@@ -21,13 +19,14 @@ PlaceObjectTag::PlaceObjectTag(const char* source, uint32_t headerLength, uint32
     currentIndex += _matrix.dataSize();
         
     _colorTransform.create(&_rawData[currentIndex], totalLength() - currentIndex);
-    currentIndex += _colorTransform.dataSize();
 }
 
-void PlaceObjectTag::print() const
+std::string PlaceObjectTag::tagType() const
 {
-    std::cout << "PlaceObjectTag valid : " << valid() << std::endl;
-    std::cout << "PlaceObjectTag code: " << code() << std::endl;
-    std::cout << "PlaceObjectTag dataLength: " << dataLength() << std::endl;
-    std::cout << "PlaceObjectTag totalLength: " << totalLength() << std::endl;
+	return "PlaceObject";
+}
+
+std::string PlaceObjectTag::tagDescription() const
+{
+	return Tag::tagDescription();
 }

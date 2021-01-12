@@ -92,6 +92,9 @@ public:
                 return 0;
         }
     }
+
+	virtual std::string tagType() const = 0;
+	virtual std::string tagDescription() const = 0;
     
 protected:
     const char*  _imageData;

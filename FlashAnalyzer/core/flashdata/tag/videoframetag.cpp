@@ -1,12 +1,10 @@
 #include "videoframetag.h"
 
-#include <iostream>
-
 #include "tools.h"
 #include "swffile.h"
 #include "definevideostreamtag.h"
 
-VideoFrameTag::VideoFrameTag(const char* source, uint32_t headerLength, uint32_t dataLength, SWFFile* swfFile) :
+VideoFrameTag::VideoFrameTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
  Tag(source, VIDEO_FRAME_TAG, headerLength, dataLength),
  _streamID(0),
  _frameNum(0),
@@ -20,9 +18,9 @@ VideoFrameTag::VideoFrameTag(const char* source, uint32_t headerLength, uint32_t
     currentIndex += sizeof(_streamID);
     
     _frameNum = readUnsigned16(&_rawData[currentIndex]);
-    currentIndex += sizeof(_frameNum);
+	/*currentIndex += sizeof(_frameNum);
 
-    if (swfFile == nullptr)
+	if (swfFile == nullptr)
     {
         _valid = false;
         return;
@@ -60,13 +58,15 @@ VideoFrameTag::VideoFrameTag(const char* source, uint32_t headerLength, uint32_t
         default:
             //TODO
             return;
-    }
+	}*/
 }
 
-void VideoFrameTag::print() const
+std::string VideoFrameTag::tagType() const
 {
-    std::cout << "VideoFrameTag valid : " << valid() << std::endl;
-    std::cout << "VideoFrameTag code: " << code() << std::endl;
-    std::cout << "VideoFrameTag dataLength: " << dataLength() << std::endl;
-    std::cout << "VideoFrameTag totalLength: " << totalLength() << std::endl;
+	return "VideoFrame";
+}
+
+std::string VideoFrameTag::tagDescription() const
+{
+	return Tag::tagDescription();
 }

@@ -1,8 +1,7 @@
 #include "definebitslossless2tag.h"
 
-#include <iostream>
+#include <sstream>
 #include <cstring>
-//#include "zlib.h"
 #include <QtZlib/zlib.h>
 
 #include "tools.h"
@@ -169,10 +168,31 @@ DefineBitsLossless2Tag::DefineBitsLossless2Tag(const char* source, uint32_t head
     _imageDataSize = _bitmapDataSize;
 }
 
-void DefineBitsLossless2Tag::print() const
+DefineBitsLossless2Tag::~DefineBitsLossless2Tag()
 {
-    std::cout << "DefineBitsLossless2Tag valid : " << valid() << std::endl;
-    std::cout << "DefineBitsLossless2Tag code: " << code() << std::endl;
-    std::cout << "DefineBitsLossless2Tag dataLength: " << dataLength() << std::endl;
-    std::cout << "DefineBitsLossless2Tag totalLength: " << totalLength() << std::endl;
+	if (_bitmapData != nullptr)
+	{
+		delete[] _bitmapData;
+	}
+	if (_unzipData != nullptr)
+	{
+		delete[] _unzipData;
+	}
+}
+
+std::string DefineBitsLossless2Tag::tagType() const
+{
+	return "DefineBitsLossless2";
+}
+
+std::string DefineBitsLossless2Tag::tagDescription() const
+{
+	std::stringstream description;
+
+	description << Tag::tagDescription();
+	description << "Color depth: " << _bitmapFormat << std::endl;
+	description << "Width: " << _bitmapWidth << std::endl;
+	description << "Height: " << _bitmapHeight << std::endl;
+
+	return description.str();
 }
