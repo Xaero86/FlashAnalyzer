@@ -8,8 +8,8 @@ class JPEGTablesTag : public Tag
 public:
     JPEGTablesTag(const char* source, uint32_t headerLength, uint32_t dataLength);
 
-	std::string tagType() const;
-	std::string tagDescription() const;
+	std::string tagType() const override;
+	std::string tagDescription() const override;
     
     const char* imageData() const {return _jpegData;}
     uint32_t imageDataSize() const {return _jpegDataSize;}

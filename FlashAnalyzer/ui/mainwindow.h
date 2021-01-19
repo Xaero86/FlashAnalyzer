@@ -9,6 +9,7 @@
 #include "loggerconsole.h"
 #include "rawdatawidget.h"
 #include "imagepreview.h"
+#include "videopreview.h"
 
 #include "swffile.h"
 
@@ -23,7 +24,6 @@ public slots:
 	void loadFile();
 	void closeFile();
 	void updateDescription(Tag* tag);
-	void openRawData();
 	void updatePreview(Tag* tag, QString& name);
 	void openPreview(int type);
 
@@ -40,6 +40,7 @@ private:
 	QTextEdit*      _descriptionWidget;
 	RawDataWidget*  _rawDataWidget;
 	ImagePreview*   _imagePreview;
+	VideoPreview*   _videoPreview;
 
 	QAction*        _actionLoad;
 	QAction*        _actionClose;

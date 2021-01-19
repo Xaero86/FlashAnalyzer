@@ -3,7 +3,7 @@
 #include <sstream>
 
 FileAttributesTag::FileAttributesTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
- Tag(source, FILE_ATTRIBUTES_TAG, headerLength, dataLength),
+ ControlTag(source, FILE_ATTRIBUTES_TAG, headerLength, dataLength),
  _hasMetaData(false),
  _hasAS3(false),
  _noCrossDomainCache(false),
@@ -26,7 +26,7 @@ std::string FileAttributesTag::tagDescription() const
 {
 	std::stringstream description;
 
-	description << Tag::tagDescription();
+	description << ControlTag::tagDescription();
 	description << "Has metadata: " << _hasMetaData << std::endl;
 	description << "Has AS3: " << _hasAS3 << std::endl;
 	description << "No cress domain cache: " << _noCrossDomainCache << std::endl;

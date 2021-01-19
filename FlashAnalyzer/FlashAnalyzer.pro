@@ -1,4 +1,6 @@
 QT       += core gui
+# QT5
+QT       += multimedia multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -87,7 +89,8 @@ SOURCES += \
 	ui/mainwindow.cpp \
 	ui/loggerconsole.cpp \
     ui/rawdatawidget.cpp \
-    ui/tagsmodel.cpp
+    ui/tagsmodel.cpp \
+    ui/videopreview.cpp
 
 HEADERS += \
     core/flashdata/datatypes.h \
@@ -136,6 +139,7 @@ HEADERS += \
     core/flashdata/tag/enabletelemetrytag.h \
     core/flashdata/tag/endtag.h \
     core/flashdata/tag/exportassetstag.h \
+    core/flashdata/tag/extractabletag.h \
     core/flashdata/tag/fileattributestag.h \
     core/flashdata/tag/framelabeltag.h \
     core/flashdata/tag/imagetag.h \
@@ -168,7 +172,8 @@ HEADERS += \
     ui/mainwindow.h \
 	ui/loggerconsole.h \
     ui/rawdatawidget.h \
-    ui/tagsmodel.h
+    ui/tagsmodel.h \
+    ui/videopreview.h
 
 INCLUDEPATH = $$PWD/ui $$PWD/core $$PWD/core/flashdata $$PWD/core/flashdata/tag/
 

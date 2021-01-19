@@ -32,6 +32,19 @@ private:
 	QList<Tag*>     _soundList;
 
 	void scanSprite(DefineSpriteTag *spriteTag);
+	static QString indexToType(int index)
+	{
+		switch (index) {
+		case 0:
+			return QString("Image");
+		case 1:
+			return QString("Video");
+		case 2:
+			return QString("Sound");
+		default:
+			return QString("");
+		}
+	}
 };
 
 #endif // EXTRACTABLEMODEL_H

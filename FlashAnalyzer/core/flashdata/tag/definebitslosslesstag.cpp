@@ -140,7 +140,7 @@ DefineBitsLosslessTag::DefineBitsLosslessTag(const char* source, uint32_t header
             bitmapDataIndex += sizeof(uint8_t);
         }
         memcpy(&_bitmapData[bitmapDataIndex], &_unzipData[_bitmapColorTableSize * 3], _bitmapWidth*_bitmapHeight);
-        bitmapDataIndex += sizeof(uint8_t)*_bitmapWidth*_bitmapHeight;
+		//bitmapDataIndex += sizeof(uint8_t)*_bitmapWidth*_bitmapHeight;
     }
     else if (_bitmapFormat == BitmapFormat::B_24BITS)
     {
@@ -194,10 +194,21 @@ std::string DefineBitsLosslessTag::tagDescription() const
 {
 	std::stringstream description;
 
-	description << Tag::tagDescription();
+	description << DefinitionTag::tagDescription();
+	description << "Type: " << imageTypeStr() << std::endl;
 	description << "Color depth: " << _bitmapFormat << std::endl;
 	description << "Width: " << _bitmapWidth << std::endl;
 	description << "Height: " << _bitmapHeight << std::endl;
 
 	return description.str();
+}
+
+void DefineBitsLosslessTag::extract(std::ofstream& outputFile)
+{
+	outputFile.write(_imageData, _imageDataSize);
+}
+
+QImage DefineBitsLosslessTag::toQImage() const
+{
+	return QImage::fromData(reinterpret_cast<const unsigned char*>(_imageData), _imageDataSize);
 }

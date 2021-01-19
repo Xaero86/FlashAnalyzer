@@ -70,8 +70,18 @@ std::string DefineBitsJPEG3Tag::tagDescription() const
 {
 	std::stringstream description;
 
-	description << Tag::tagDescription();
-	description << "Type: " << imageTypeExtension() << std::endl;
+	description << DefinitionTag::tagDescription();
+	description << "Type: " << imageTypeStr() << std::endl;
 
 	return description.str();
+}
+
+void DefineBitsJPEG3Tag::extract(std::ofstream& outputFile)
+{
+	outputFile.write(_imageData, _imageDataSize);
+}
+
+QImage DefineBitsJPEG3Tag::toQImage() const
+{
+	return QImage::fromData(reinterpret_cast<const unsigned char*>(_imageData), _imageDataSize);
 }

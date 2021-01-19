@@ -1,7 +1,7 @@
 #include "enabledebugger2tag.h"
 
 EnableDebugger2Tag::EnableDebugger2Tag(const char* source, uint32_t headerLength, uint32_t dataLength) :
- Tag(source, ENABLE_DEBUGGER_2_TAG, headerLength, dataLength)
+ ControlTag(source, ENABLE_DEBUGGER_2_TAG, headerLength, dataLength)
 {
 }
 
@@ -12,5 +12,5 @@ std::string EnableDebugger2Tag::tagType() const
 
 std::string EnableDebugger2Tag::tagDescription() const
 {
-	return Tag::tagDescription();
+	return ControlTag::tagDescription();
 }

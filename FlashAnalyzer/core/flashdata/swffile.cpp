@@ -171,7 +171,7 @@ SWFFile::SWFFile(std::string fileName) :
                 {
                     std::cerr << "Warning: file attibutes tag is not locate at the beginning" << std::endl;
                 }
-				_fileAttributesTag = (FileAttributesTag*) &newTag;
+				_fileAttributesTag = dynamic_cast<FileAttributesTag*>(newTag);
             }
 			else if (newTag->code() == JPEG_TABLES_TAG)
             {
@@ -179,7 +179,7 @@ SWFFile::SWFFile(std::string fileName) :
                 {
                     std::cerr << "Warning: only one JPEG table tag is allowed" << std::endl;
                 }
-				_jpegTablesTag = (JPEGTablesTag*) &newTag;
+				_jpegTablesTag = dynamic_cast<JPEGTablesTag*>(newTag);
             }
         }
         else
@@ -189,6 +189,11 @@ SWFFile::SWFFile(std::string fileName) :
             break;
         }
     }
+
+	for (auto& tag : tags())
+	{
+		tag->link(this);
+	}
 }
 
 SWFFile::~SWFFile()
@@ -215,16 +220,16 @@ std::string SWFFile::toString() const
     return result.str();
 }
 
-/*DefinitionTag* SWFFile::getDefinitionTag(uint16_t charactedId) const
+DefinitionTag* SWFFile::getDefinitionTag(uint16_t charactedId)
 {
     DefinitionTag* result = nullptr;
-    for (Tag::const_iterator itTag = cbegin(); itTag != cend(); ++itTag)
+	for (auto& tag : tags())
     {
-        result = dynamic_cast<DefinitionTag*>(*itTag);
+		result = dynamic_cast<DefinitionTag*>(tag.get());
         if (result && (result->uid() == charactedId))
         {
             return result;
         }
     }
     return nullptr;
-}*/
+}

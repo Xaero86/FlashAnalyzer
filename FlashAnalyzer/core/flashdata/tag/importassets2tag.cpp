@@ -1,7 +1,7 @@
 #include "importassets2tag.h"
 
 ImportAssets2Tag::ImportAssets2Tag(const char* source, uint32_t headerLength, uint32_t dataLength) :
- Tag(source, IMPORT_ASSETS_2_TAG, headerLength, dataLength)
+ ControlTag(source, IMPORT_ASSETS_2_TAG, headerLength, dataLength)
 {
 }
 
@@ -12,5 +12,5 @@ std::string ImportAssets2Tag::tagType() const
 
 std::string ImportAssets2Tag::tagDescription() const
 {
-	return Tag::tagDescription();
+	return ControlTag::tagDescription();
 }

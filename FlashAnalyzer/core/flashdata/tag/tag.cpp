@@ -321,13 +321,15 @@ std::string Tag::tagDescription() const
 {
 	std::stringstream description;
 
-	description << "Valid: " << valid() << std::endl;
 	description << "Code: " << code() << std::endl;
 	description << "DataLength: " << dataLength() << std::endl;
 	description << "TotalLength: " << totalLength() << std::endl;
 
 	return description.str();
 }
+
+void Tag::link(SWFFile* /*swfFile*/) {}
+
 bool Tag::isImage() const
 {
 	return ((_code == DEFINE_BITS_TAG) ||

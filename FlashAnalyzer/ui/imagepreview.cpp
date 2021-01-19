@@ -12,6 +12,7 @@ ImagePreview::ImagePreview(QWidget *parent)
 	setAutoFillBackground(true);
 
 	this->setLayout(new QHBoxLayout);
+	setMinimumSize(200,200);
 }
 
 void ImagePreview::setTagImage(Tag* tag, QString &name)
@@ -24,7 +25,7 @@ void ImagePreview::setTagImage(Tag* tag, QString &name)
 	if (tag->isImage())
 	{
 		ImageTag* imageTag = dynamic_cast<ImageTag*>(tag);
-		_image = QImage::fromData(reinterpret_cast<const unsigned char*>(imageTag->imageData()), imageTag->imageDataSize());
+		_image = imageTag->toQImage();
 		if (!_image.isNull())
 		{
 			setWindowFilePath(name);
@@ -36,7 +37,7 @@ void ImagePreview::setTagImage(Tag* tag, QString &name)
 		}
 		else
 		{
-			resize(200,100);
+			resize(200,200);
 			repaint();
 		}
 	}

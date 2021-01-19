@@ -6,12 +6,12 @@
 class DefinitionTag : public Tag
 {
 public:
-    DefinitionTag(const char* source, uint32_t code, uint32_t headerLength, uint32_t dataLength);
+	DefinitionTag(const char* source, uint32_t code, uint32_t headerLength, uint32_t dataLength);
     
     uint16_t uid() const {return _uid;}
 
-	virtual std::string tagType() const = 0;
-	virtual std::string tagDescription() const = 0;
+	virtual std::string tagType() const override = 0;
+	virtual std::string tagDescription() const override;
     
 protected:
     uint16_t      _uid;

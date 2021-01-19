@@ -4,3 +4,8 @@ ControlTag::ControlTag(const char* source, uint32_t code, uint32_t headerLength,
  Tag(source, code, headerLength, dataLength)
 {
 }
+
+std::string ControlTag::tagDescription() const
+{
+	return Tag::tagDescription();
+}

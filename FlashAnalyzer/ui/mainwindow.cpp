@@ -39,6 +39,10 @@ MainWindow::MainWindow(QWidget *parent)
 	_imagePreview->setWindowFlags(_imagePreview->windowFlags() | Qt::Window);
 	_imagePreview->hide();
 
+	_videoPreview = new VideoPreview(this);
+	_videoPreview->setWindowFlags(_imagePreview->windowFlags() | Qt::Window);
+	_videoPreview->hide();
+
 	_loggerConsole = new LoggerConsole(this);
 	_loggerConsole->setWindowFlags(_loggerConsole->windowFlags() | Qt::Window | Qt::WindowStaysOnTopHint);
 	_loggerConsole->setMinimumSize(300,200);
@@ -64,8 +68,9 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(_actionClose, SIGNAL(triggered()), this, SLOT(closeFile()));
 	connect(_actionQuit,  SIGNAL(triggered()), this, SLOT(close()));
 	connect(_actionDebug, SIGNAL(triggered()), _loggerConsole, SLOT(show()));
+
 	connect(_tagsWidget,  SIGNAL(clicked(const QModelIndex &)), _tagsModel, SLOT(rowSelected(const QModelIndex &)));
-	connect(_tagsWidget,  SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(openRawData()));
+	connect(_tagsWidget,  SIGNAL(doubleClicked(const QModelIndex &)), _rawDataWidget, SLOT(show()));
 	connect(_tagsModel,   SIGNAL(tagSelected(Tag*)), this, SLOT(updateDescription(Tag*)));
 	connect(_extractableWidget,  SIGNAL(tagSelected(Tag*,QString&)), this, SLOT(updatePreview(Tag*,QString&)));
 	connect(_extractableWidget,  SIGNAL(doubleClick(int)), this, SLOT(openPreview(int)));
@@ -84,16 +89,19 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::loadFile()
 {
 	QUrl imageFile = QFileDialog::getOpenFileUrl(this, "Open flash file", _lastUsedPath, "Flash file (*.swf)");
-	if (!imageFile.isEmpty())
+	if (!imageFile.isEmpty() && imageFile.isLocalFile())
 	{
 		closeFile();
-		_lastUsedPath = imageFile;
-		_swfFile = new SWFFile(_lastUsedPath.toLocalFile().toStdString());
 
-		setWindowFilePath(_lastUsedPath.toLocalFile());
+		QFileInfo fileInfo(imageFile.toLocalFile());
+		_lastUsedPath = QUrl::fromLocalFile(fileInfo.dir().path());
+		_swfFile = new SWFFile(imageFile.toLocalFile().toStdString());
+
+		setWindowFilePath(imageFile.toLocalFile());
 
 		_tagsModel->setSwfData(_swfFile);
 		_extractableModel->setSwfData(_swfFile);
+		_extractableWidget->setDefaultUrl(_lastUsedPath);
 
 		_descriptionWidget->setText(QString::fromStdString(_swfFile->toString()));
 		_rawDataWidget->clear();
@@ -112,6 +120,8 @@ void MainWindow::closeFile()
 	setWindowFilePath("");
 	_descriptionWidget->clear();
 	_rawDataWidget->clear();
+	_imagePreview->hide();
+	_videoPreview->hide();
 }
 
 void MainWindow::updateDescription(Tag* tag)
@@ -122,11 +132,6 @@ void MainWindow::updateDescription(Tag* tag)
 	}
 	_descriptionWidget->setText(QString::fromStdString(tag->tagDescription()));
 	_rawDataWidget->setData(tag->data(), tag->dataSize());
-}
-
-void MainWindow::openRawData()
-{
-	_rawDataWidget->show();
 }
 
 void MainWindow::updatePreview(Tag* tag, QString& name)
@@ -140,6 +145,10 @@ void MainWindow::updatePreview(Tag* tag, QString& name)
 	{
 		_imagePreview->setTagImage(tag, name);
 	}
+	if (tag->isVideo())
+	{
+		_videoPreview->setTagVideo(tag, name);
+	}
 	_descriptionWidget->setText(QString::fromStdString(tag->tagDescription()));
 }
 
@@ -148,5 +157,9 @@ void MainWindow::openPreview(int type)
 	if (type == 0)
 	{
 		_imagePreview->show();
+	}
+	else if (type == 1)
+	{
+		_videoPreview->show();
 	}
 }

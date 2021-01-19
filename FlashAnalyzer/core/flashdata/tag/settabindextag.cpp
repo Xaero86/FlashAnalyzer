@@ -1,7 +1,7 @@
 #include "settabindextag.h"
 
 SetTabIndexTag::SetTabIndexTag(const char* source, uint32_t headerLength, uint32_t dataLength) :
- Tag(source, SET_TAB_INDEX_TAG, headerLength, dataLength)
+ ControlTag(source, SET_TAB_INDEX_TAG, headerLength, dataLength)
 {
 }
 
@@ -12,5 +12,5 @@ std::string SetTabIndexTag::tagType() const
 
 std::string SetTabIndexTag::tagDescription() const
 {
-	return Tag::tagDescription();
+	return ControlTag::tagDescription();
 }

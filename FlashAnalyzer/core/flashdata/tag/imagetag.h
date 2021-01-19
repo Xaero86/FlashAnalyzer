@@ -2,8 +2,11 @@
 #define IMAGETAG_H
 
 #include "definitiontag.h"
+#include "extractabletag.h"
 
-class ImageTag : public DefinitionTag
+#include <QImage>
+
+class ImageTag : public DefinitionTag, public ExtractableTag
 {
 public:
     enum ImageType
@@ -22,28 +25,29 @@ public:
      _imageType(ImageType::UNKNOWN_IMAGE) {}
     
     const char* imageData() const {return _imageData;}
-    uint32_t imageDataSize() const {return _imageDataSize;}
-    ImageType imageType() const {return _imageType;}
+	uint32_t imageDataSize() const {return _imageDataSize;}
+
+	virtual QImage toQImage() const = 0;
     
-    const char* imageTypeExtension() const
+	std::string imageTypeStr() const
     {
         switch (_imageType)
         {
             case ImageType::JPEG:
-                return ".jpeg";
+				return std::string("JPEG");
                 break;
             case ImageType::PNG:
-                return ".png";
+				return std::string("PNG");
                 break;
             case ImageType::GIF89a:
-                return ".gif";
+				return std::string("GIF");
                 break;
-            case ImageType::BMP:
-                return ".bmp";
+			case ImageType::BMP:
+				return std::string("BMP");
                 break;
             case ImageType::UNKNOWN_IMAGE:
             default:
-                return "";
+				return std::string("UNKNOWN");
         }
     }
 
@@ -93,8 +97,30 @@ public:
         }
     }
 
-	virtual std::string tagType() const = 0;
-	virtual std::string tagDescription() const = 0;
+	virtual std::string tagType() const override = 0;
+	virtual std::string tagDescription() const override = 0;
+
+	std::string extensionFile() const override
+	{
+		switch (_imageType)
+		{
+			case ImageType::JPEG:
+				return ".jpeg";
+				break;
+			case ImageType::PNG:
+				return ".png";
+				break;
+			case ImageType::GIF89a:
+				return ".gif";
+				break;
+			case ImageType::BMP:
+				return ".bmp";
+				break;
+			case ImageType::UNKNOWN_IMAGE:
+			default:
+				return "";
+		}
+	}
     
 protected:
     const char*  _imageData;

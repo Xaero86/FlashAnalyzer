@@ -24,6 +24,7 @@ public:
 	virtual std::string tagType() const;
 	virtual std::string tagDescription() const;
 
+	virtual void link(SWFFile* swfFile);
 	void setParent(Tag* parent) {_parent = parent;}
 	Tag* parent() const {return _parent;}
 

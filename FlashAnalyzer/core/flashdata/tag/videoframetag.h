@@ -11,8 +11,9 @@ public:
     const char* videoData() {return _videoData;}
     uint32_t videoDataSize() {return _videoDataSize;}
 
-	std::string tagType() const;
-	std::string tagDescription() const;
+	std::string tagType() const override;
+	std::string tagDescription() const override;
+	void link(SWFFile* swfFile) override;
     
 private:
     uint16_t         _streamID;

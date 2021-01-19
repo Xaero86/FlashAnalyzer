@@ -3,8 +3,11 @@
 
 #include "definitiontag.h"
 #include "videoframetag.h"
+#include "extractabletag.h"
 
-class DefineVideoStreamTag : public DefinitionTag
+#include <QByteArray>
+
+class DefineVideoStreamTag : public DefinitionTag, public ExtractableTag
 {
 public:
     enum VideoFlags
@@ -27,26 +30,6 @@ public:
         UNKNOWN_CODEC
     };
     
-    const char* videoTypeExtension() const
-    {
-        switch (_codecId)
-        {
-            case CodecID::SORENSON_H_263:
-                return ".h263";
-                break;
-            case CodecID::SCREEN_VIDEO:
-                return "";
-                break;
-            case CodecID::VP6:
-            case CodecID::VP6_ALPHA:
-                return ".vp6";
-                break;
-            case CodecID::UNKNOWN_CODEC:
-            default:
-                return "";
-        }
-    }
-    
     DefineVideoStreamTag(const char* source, uint32_t headerLength, uint32_t dataLength);
     
     uint16_t numFrames() const {return _numFrames;}
@@ -57,8 +40,12 @@ public:
     void setFrame(VideoFrameTag* frame, uint16_t index);
     VideoFrameTag* getFrame(uint16_t index) const;
 
-	std::string tagType() const;
-	std::string tagDescription() const;
+	std::string tagType() const override;
+	std::string tagDescription() const override;
+
+	std::string extensionFile() const override;
+	void extract(std::ofstream& outputFile) override;
+	QByteArray getFlv();
     
 private:
     uint16_t        _numFrames;
@@ -68,6 +55,10 @@ private:
     bool            _smoothing;
     CodecID         _codecId;
     VideoFrameTag** _frames;
+
+	QByteArray      _flvContent;
+
+	void toFlv();
 };
 
 #endif // DEFINEVIDEOSTREAMTAG_H

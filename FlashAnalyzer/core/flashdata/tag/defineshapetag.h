@@ -9,8 +9,8 @@ class DefineShapeTag : public DefinitionTag
 public:
     DefineShapeTag(const char* source, uint32_t headerLength, uint32_t dataLength);
 
-	std::string tagType() const;
-	std::string tagDescription() const;
+	std::string tagType() const override;
+	std::string tagDescription() const override;
     
 private:
     RectangleRecord  _shapeBounds;

@@ -45,8 +45,16 @@ std::string DefineSpriteTag::tagDescription() const
 {
 	std::stringstream description;
 
-	description << Tag::tagDescription();
+	description << DefinitionTag::tagDescription();
 	description << "Number of tags: " << _tags.size() << std::endl;
 
 	return description.str();
+}
+
+void DefineSpriteTag::link(SWFFile* swfFile)
+{
+	for (auto& tag : tags())
+	{
+		tag->link(swfFile);
+	}
 }

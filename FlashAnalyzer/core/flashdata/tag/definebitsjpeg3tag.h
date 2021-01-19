@@ -8,8 +8,11 @@ class DefineBitsJPEG3Tag : public ImageTag
 public:
     DefineBitsJPEG3Tag(const char* source, uint32_t headerLength, uint32_t dataLength);
 
-	std::string tagType() const;
-	std::string tagDescription() const;
+	std::string tagType() const override;
+	std::string tagDescription() const override;
+
+	void extract(std::ofstream& outputFile) override;
+	QImage toQImage() const override;
     
     const char* bitmapAlphaData() const {return _bitmapAlphaData;}
     uint32_t bitmapAlphaDataSize() const {return _bitmapAlphaDataSize;}

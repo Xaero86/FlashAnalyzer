@@ -8,8 +8,8 @@ class DefineMorphShape2Tag : public Tag
 public:
     DefineMorphShape2Tag(const char* source, uint32_t headerLength, uint32_t dataLength);
 
-	std::string tagType() const;
-	std::string tagDescription() const;
+	std::string tagType() const override;
+	std::string tagDescription() const override;
 };
 
 #endif // DEFINEMORPHSHAPE2TAG_H

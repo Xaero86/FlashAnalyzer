@@ -23,6 +23,7 @@ public:
     
 	FileAttributesTag* fileAttributesTag() const {return _fileAttributesTag;}
 	JPEGTablesTag* jpegTablesTag() const {return _jpegTablesTag;}
+	DefinitionTag* getDefinitionTag(uint16_t charactedId);
 
 	const char* data() const {return _data;}
 	uint32_t dataSize() const {return _dataSize;}

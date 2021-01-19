@@ -124,33 +124,11 @@ QVariant ExtractableModel::data(const QModelIndex &index, int role) const
 	case Qt::DisplayRole:
 		if (!index.parent().isValid())
 		{
-			if (index.row() == 0)
-			{
-				return QString("Images");
-			}
-			if (index.row() == 1)
-			{
-				return QString("Video");
-			}
-			if (index.row() == 2)
-			{
-				return QString("Sounds");
-			}
+			return indexToType(index.row());
 		}
 		else
 		{
-			if (index.parent().row() == 0)
-			{
-				return QString("Image")+QString::number(index.row());
-			}
-			if (index.parent().row() == 1)
-			{
-				return QString("Video")+QString::number(index.row());
-			}
-			if (index.parent().row() == 2)
-			{
-				return QString("Sound")+QString::number(index.row());
-			}
+			return indexToType(index.parent().row())+QString::number(index.row());
 		}
 		break;
 	case Qt::BackgroundRole:

@@ -128,19 +128,19 @@ DefineBitsLossless2Tag::DefineBitsLossless2Tag(const char* source, uint32_t head
         for (uint16_t col = 0; col < _bitmapColorTableSize; col++)
         {
             // blue
-            _bitmapData[bitmapDataIndex] = _unzipData[2 + 3*col];
+			_bitmapData[bitmapDataIndex] = _unzipData[2 + 4*col];
             bitmapDataIndex += sizeof(uint8_t);
             // green
-            _bitmapData[bitmapDataIndex] = _unzipData[1 + 3*col];
+			_bitmapData[bitmapDataIndex] = _unzipData[1 + 4*col];
             bitmapDataIndex += sizeof(uint8_t);
             // red
-            _bitmapData[bitmapDataIndex] = _unzipData[0 + 3*col];
+			_bitmapData[bitmapDataIndex] = _unzipData[0 + 4*col];
             bitmapDataIndex += sizeof(uint8_t);
             // reserved
             bitmapDataIndex += sizeof(uint8_t);
         }
         memcpy(&_bitmapData[bitmapDataIndex], &_unzipData[_bitmapColorTableSize * 4], _bitmapWidth*_bitmapHeight);
-        bitmapDataIndex += sizeof(uint8_t)*_bitmapWidth*_bitmapHeight;
+		//bitmapDataIndex += sizeof(uint8_t)*_bitmapWidth*_bitmapHeight;
     }
     else if (_bitmapFormat == BitmapFormat::B_24BITS)
     {
@@ -189,10 +189,21 @@ std::string DefineBitsLossless2Tag::tagDescription() const
 {
 	std::stringstream description;
 
-	description << Tag::tagDescription();
+	description << DefinitionTag::tagDescription();
+	description << "Type: " << imageTypeStr() << std::endl;
 	description << "Color depth: " << _bitmapFormat << std::endl;
 	description << "Width: " << _bitmapWidth << std::endl;
 	description << "Height: " << _bitmapHeight << std::endl;
 
 	return description.str();
+}
+
+void DefineBitsLossless2Tag::extract(std::ofstream& outputFile)
+{
+	outputFile.write(_imageData, _imageDataSize);
+}
+
+QImage DefineBitsLossless2Tag::toQImage() const
+{
+	return QImage::fromData(reinterpret_cast<const unsigned char*>(_imageData), _imageDataSize);
 }

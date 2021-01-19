@@ -1,9 +1,9 @@
 #ifndef FILEATTRIBUTESTAG_H
 #define FILEATTRIBUTESTAG_H
 
-#include "tag.h"
+#include "controltag.h"
 
-class FileAttributesTag : public Tag
+class FileAttributesTag : public ControlTag
 {
 public:
     FileAttributesTag(const char* source, uint32_t headerLength, uint32_t dataLength);
@@ -13,8 +13,8 @@ public:
     bool noCrossDomainCache() const {return _noCrossDomainCache;}
     bool useNetwork() const {return _useNetwork;}
 
-	std::string tagType() const;
-	std::string tagDescription() const;
+	std::string tagType() const override;
+	std::string tagDescription() const override;
     
 private:
     bool   _hasMetaData;

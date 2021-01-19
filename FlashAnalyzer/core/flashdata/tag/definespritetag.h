@@ -10,8 +10,10 @@ public:
 
 	Tag::tags_t& tags() {return _tags;}
 
-	std::string tagType() const;
-	std::string tagDescription() const;
+	std::string tagType() const override;
+	std::string tagDescription() const override;
+
+	void link(SWFFile* swfFile) override;
     
 private:
     uint16_t       _frameCount;
