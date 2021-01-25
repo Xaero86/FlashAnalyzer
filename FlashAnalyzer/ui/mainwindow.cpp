@@ -80,6 +80,11 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(_imagePreview,  SIGNAL(upPress()), _extractableWidget, SLOT(selectPrevious()));
 	connect(_imagePreview,  SIGNAL(downPress()), _extractableWidget, SLOT(selectNext()));
 
+	connect(_videoPreview,  SIGNAL(leftPress()), _extractableWidget, SLOT(selectPrevious()));
+	connect(_videoPreview,  SIGNAL(rightPress()), _extractableWidget, SLOT(selectNext()));
+	connect(_videoPreview,  SIGNAL(upPress()), _extractableWidget, SLOT(selectPrevious()));
+	connect(_videoPreview,  SIGNAL(downPress()), _extractableWidget, SLOT(selectNext()));
+
 	// resize et centre
 	adjustSize();
 	QPoint center = this->screen()->availableGeometry().center();
@@ -112,6 +117,8 @@ void MainWindow::closeFile()
 {
 	if (_swfFile != nullptr)
 	{
+		_imagePreview->setTagImage();
+		_videoPreview->setTagVideo();
 		_tagsModel->setSwfData(nullptr);
 		_extractableModel->setSwfData(nullptr);
 		delete _swfFile;

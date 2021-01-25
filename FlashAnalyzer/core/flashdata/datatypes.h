@@ -155,4 +155,13 @@ private:
     uint8_t       _alpha;
 };
 
+enum CodecID
+{
+	SORENSON_H_263 = 2,
+	SCREEN_VIDEO = 3,
+	VP6 = 4,
+	VP6_ALPHA = 5,
+	UNKNOWN_CODEC
+};
+
 #endif // DATATYPES_H

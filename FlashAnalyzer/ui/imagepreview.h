@@ -12,7 +12,7 @@ class ImagePreview : public QWidget
 public:
 	ImagePreview(QWidget *parent = nullptr);
 
-	void setTagImage(Tag* tag, QString &name);
+	void setTagImage(Tag* tag = nullptr, const QString &name = QString("Image preview"));
 
 signals:
 	void leftPress();

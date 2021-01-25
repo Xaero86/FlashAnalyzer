@@ -2,6 +2,9 @@
 #define VIDEOFRAMETAG_H
 
 #include "tag.h"
+#include "datatypes.h"
+
+#include <QDataStream>
 
 class VideoFrameTag : public Tag
 {
@@ -14,7 +17,9 @@ public:
 	std::string tagType() const override;
 	std::string tagDescription() const override;
 	void link(SWFFile* swfFile) override;
-    
+
+	uint32_t toFlv(QDataStream& flvStream, CodecID codecId, unsigned int fps, uint16_t width, uint16_t height) const;
+
 private:
     uint16_t         _streamID;
     uint16_t         _frameNum;

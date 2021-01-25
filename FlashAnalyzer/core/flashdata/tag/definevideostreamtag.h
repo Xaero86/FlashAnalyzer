@@ -2,6 +2,7 @@
 #define DEFINEVIDEOSTREAMTAG_H
 
 #include "definitiontag.h"
+#include "datatypes.h"
 #include "videoframetag.h"
 #include "extractabletag.h"
 
@@ -20,16 +21,7 @@ public:
         LEVEL_4 = 5,
         UNKNOWN_FLAG
     };
-    
-    enum CodecID
-    {
-        SORENSON_H_263 = 2,
-        SCREEN_VIDEO = 3,
-        VP6 = 4,
-        VP6_ALPHA = 5,
-        UNKNOWN_CODEC
-    };
-    
+
     DefineVideoStreamTag(const char* source, uint32_t headerLength, uint32_t dataLength);
     
     uint16_t numFrames() const {return _numFrames;}

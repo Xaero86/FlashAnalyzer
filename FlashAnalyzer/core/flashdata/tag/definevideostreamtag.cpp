@@ -3,7 +3,7 @@
 #include <sstream>
 #include <cstring>
 
-#include <QtEndian>
+#include <QDataStream>
 
 #include "tools.h"
 
@@ -100,33 +100,13 @@ std::string DefineVideoStreamTag::tagDescription() const
 
 std::string DefineVideoStreamTag::extensionFile() const
 {
-	switch (_codecId)
-	{
-		case CodecID::SORENSON_H_263:
-			return ".h263";
-			break;
-		case CodecID::SCREEN_VIDEO:
-			return std::string();
-			break;
-		case CodecID::VP6:
-		case CodecID::VP6_ALPHA:
-			return ".vp6";
-			break;
-		case CodecID::UNKNOWN_CODEC:
-		default:
-		return std::string();
-	}
+	return ".flv";
 }
 
 void DefineVideoStreamTag::extract(std::ofstream& outputFile)
 {
 	toFlv();
-	// TODO
-	VideoFrameTag* firstFram = getFrame(0);
-	if (firstFram != nullptr)
-	{
-		outputFile.write(firstFram->videoData(), firstFram->videoDataSize());
-	}
+	outputFile.write(_flvContent.data(), _flvContent.count());
 }
 
 QByteArray DefineVideoStreamTag::getFlv()
@@ -141,15 +121,31 @@ void DefineVideoStreamTag::toFlv()
 	{
 		return;
 	}
+	QDataStream flvStream(&_flvContent, QIODevice::WriteOnly);
+	flvStream.setByteOrder(QDataStream::BigEndian);
 	// Header
-	_flvContent.append('F');
-	_flvContent.append('L');
-	_flvContent.append('V');
+	flvStream << (uchar) 'F';
+	flvStream << (uchar) 'L';
+	flvStream << (uchar) 'V';
 	// Version
-	_flvContent.append(0x0a);
+	flvStream << (uchar) 0x01;
 	// Flag (video=1, audio=4)
-	_flvContent.append(0x01);
+	flvStream << (uchar) 0x01;
 	// Header size
-	uint32_t headerSize = qToBigEndian<uint32_t>(9);
-	//_flvContent.append();
+	flvStream << (uint32_t) 9;
+
+	// Previous tag size (first is 0)
+	flvStream << (uint32_t) 0;
+
+	for (int frameIndex = 0; frameIndex < _numFrames; frameIndex++)
+	{
+		// Previous tag size
+		VideoFrameTag* currentFrame = _frames[frameIndex];
+		if (currentFrame != nullptr)
+		{
+			// 40 fps
+			uint32_t tagSize = currentFrame->toFlv(flvStream, _codecId, 40, _width, _height);
+			flvStream << (uint32_t) tagSize;
+		}
+	}
 }

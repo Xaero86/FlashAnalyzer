@@ -15,7 +15,7 @@ ImagePreview::ImagePreview(QWidget *parent)
 	setMinimumSize(200,200);
 }
 
-void ImagePreview::setTagImage(Tag* tag, QString &name)
+void ImagePreview::setTagImage(Tag* tag, const QString &name)
 {
 	_image = QImage();
 	if (tag == nullptr)
