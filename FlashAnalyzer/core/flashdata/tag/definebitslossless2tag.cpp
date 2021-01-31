@@ -198,9 +198,9 @@ std::string DefineBitsLossless2Tag::tagDescription() const
 	return description.str();
 }
 
-void DefineBitsLossless2Tag::extract(std::ofstream& outputFile)
+void DefineBitsLossless2Tag::extract(QDataStream &outputStream)
 {
-	outputFile.write(_imageData, _imageDataSize);
+	outputStream.writeRawData(_imageData, _imageDataSize);
 }
 
 QImage DefineBitsLossless2Tag::toQImage() const

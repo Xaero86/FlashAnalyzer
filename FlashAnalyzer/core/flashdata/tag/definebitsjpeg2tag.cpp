@@ -65,9 +65,9 @@ std::string DefineBitsJPEG2Tag::tagDescription() const
 	return description.str();
 }
 
-void DefineBitsJPEG2Tag::extract(std::ofstream& outputFile)
+void DefineBitsJPEG2Tag::extract(QDataStream &outputStream)
 {
-	outputFile.write(_imageData, _imageDataSize);
+	outputStream.writeRawData(_imageData, _imageDataSize);
 }
 
 QImage DefineBitsJPEG2Tag::toQImage() const

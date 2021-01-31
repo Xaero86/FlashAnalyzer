@@ -9,7 +9,8 @@ void TagsModel::setSwfData(SWFFile* swfFile)
 {
 	if (_swfFile != nullptr)
 	{
-		removeRows(0,_swfFile->tags().size());
+		beginResetModel();
+		endResetModel();
 		_swfFile = nullptr;
 	}
 

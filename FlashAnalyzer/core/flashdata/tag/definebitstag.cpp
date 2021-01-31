@@ -49,16 +49,16 @@ void DefineBitsTag::link(SWFFile* swfFile)
 	_tableTag = swfFile->jpegTablesTag();
 }
 
-void DefineBitsTag::extract(std::ofstream& outputFile)
+void DefineBitsTag::extract(QDataStream& outputStream)
 {
 	if ((_tableTag != nullptr) && (_tableTag->imageDataSize() > 2))
 	{
-		outputFile.write(_tableTag->imageData(), _tableTag->imageDataSize() - 2);
-		outputFile.write(&_imageData[2], _imageDataSize - 2);
+		outputStream.writeRawData(_tableTag->imageData(), _tableTag->imageDataSize() - 2);
+		outputStream.writeRawData(&_imageData[2], _imageDataSize - 2);
 	}
 	else
 	{
-		outputFile.write(_imageData, _imageDataSize);
+		outputStream.writeRawData(_imageData, _imageDataSize);
 	}
 }
 

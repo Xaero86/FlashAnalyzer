@@ -1,42 +1,58 @@
 #ifndef VIDEOPREVIEW_H
 #define VIDEOPREVIEW_H
 
-#include <QWidget>
 #include <QKeyEvent>
 #include <QMediaPlayer>
+#include <QMediaPlaylist>
 #include <QVideoWidget>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QRadioButton>
 
-#include "tag.h"
-
-class VideoPreview : public QVideoWidget
+class VideoPreview : public QWidget
 {
 	Q_OBJECT
 public:
 	VideoPreview(QWidget *parent = nullptr);
 
-	void setTagVideo(Tag* tag = nullptr, const QString &name = QString("Video preview"));
+	void clearPlaylist();
+	void addVideo(int pos, const QMediaContent &video);
+	void selectVideo(int pos);
+
+public slots:
+	void nextVideo();
+	void previousVideo();
 
 signals:
-	void leftPress();
-	void rightPress();
-	void upPress();
-	void downPress();
-	void spacePress();
+	void videoChanged(int index);
 
 protected slots:
-	void playPause();
-	void handleError(QMediaPlayer::Error error);
-	void handleMediaStateChanged(QMediaPlayer::MediaStatus status);
+	void handleIndexChanged(int position);
+	void handleMediaChanged(const QMediaContent &content);
+	void handlePlayerStateChanged(QMediaPlayer::State state);
+	void handlePlayPause();
+	void handlePlaybackMode();
 
 protected:
 	void keyPressEvent(QKeyEvent *event) override;
 	void showEvent(QShowEvent *event) override;
 	void hideEvent(QHideEvent *event) override;
+	void enterEvent(QEvent *) override;
+	void leaveEvent(QEvent *) override;
+	void resizeEvent(QResizeEvent *) override;
 
 private:
 	QMediaPlayer*   _mediaPlayer;
-	bool            _playlistMode;
-	Tag*            _tag;
+	QMediaPlaylist* _mediaPlaylist;
+
+	QVideoWidget*   _videoWidget;
+	QWidget*        _toolbar;
+	QPushButton*    _playButton;
+	QPushButton*    _nextButton;
+	QPushButton*    _prevButton;
+	QCheckBox*      _loopCheckBox;
+	QRadioButton*   _allRadio;
+	QRadioButton*   _currentRadio;
 };
 
 #endif // VIDEOPREVIEW_H

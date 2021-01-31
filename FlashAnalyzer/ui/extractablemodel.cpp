@@ -27,14 +27,20 @@ void ExtractableModel::setSwfData(SWFFile* swfFile)
 		{
 			if (tag->isImage())
 			{
+				QString name = indexToType(0)+QString::number(_imageList.size());
+				emit newImage(tag.get(), name, _imageList.size());
 				_imageList.push_back(tag.get());
 			}
 			if (tag->isVideo())
 			{
+				QString name = indexToType(1)+QString::number(_videoList.size());
+				emit newVideo(tag.get(), name, _videoList.size());
 				_videoList.push_back(tag.get());
 			}
 			if (tag->isSound())
 			{
+				QString name = indexToType(2)+QString::number(_soundList.size());
+				emit newSound(tag.get(), name, _soundList.size());
 				_soundList.push_back(tag.get());
 			}
 			if (tag->code() == DEFINE_SPRITE_TAG)
@@ -61,14 +67,20 @@ void ExtractableModel::scanSprite(DefineSpriteTag *spriteTag)
 	{
 		if (tag->isImage())
 		{
+			QString name = indexToType(0)+QString::number(_imageList.size());
+			emit newImage(tag.get(), name, _imageList.size());
 			_imageList.push_back(tag.get());
 		}
 		if (tag->isVideo())
 		{
+			QString name = indexToType(1)+QString::number(_videoList.size());
+			emit newVideo(tag.get(), name, _videoList.size());
 			_videoList.push_back(tag.get());
 		}
 		if (tag->isSound())
 		{
+			QString name = indexToType(2)+QString::number(_soundList.size());
+			emit newSound(tag.get(), name, _soundList.size());
 			_soundList.push_back(tag.get());
 		}
 		if (tag->code() == DEFINE_SPRITE_TAG)
@@ -108,7 +120,7 @@ int ExtractableModel::rowCount(const QModelIndex &parent) const
 	return 0;
 }
 
-int ExtractableModel::columnCount(const QModelIndex &/*parent*/) const
+int ExtractableModel::columnCount(const QModelIndex &) const
 {
 	return 1;
 }

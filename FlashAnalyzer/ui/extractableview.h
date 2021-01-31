@@ -17,8 +17,9 @@ public:
 	void setDefaultUrl(QUrl& url);
 
 public slots:
-	void selectNext();
-	void selectPrevious();
+	void selectImage(int pos);
+	void selectVideo(int pos);
+	void selectSound(int pos);
 
 protected slots:
 	void selChanged();
@@ -27,11 +28,16 @@ protected slots:
 	void handleExtract();
 
 signals:
-	void tagSelected(Tag* tag, QString& name);
-	void doubleClick(int type);
+	void imageSelected(Tag* tag, QString& name, int pos);
+	void videoSelected(Tag* tag, QString& name, int pos);
+	void soundSelected(Tag* tag, QString& name, int pos);
+	void imagePreview();
+	void videoPreview();
+	void soundPreview();
 
 private:
 	QMenu*    _contextMenu;
+	QAction*  _actionPreview;
 	QAction*  _actionExtract;
 
 	QUrl        _lastUsedPath;

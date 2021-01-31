@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include <QDataStream>
+#include <QUrl>
 
 #include "tools.h"
 
@@ -16,7 +17,9 @@ DefineVideoStreamTag::DefineVideoStreamTag(const char* source, uint32_t headerLe
  _smoothing(false),
  _codecId(UNKNOWN_CODEC),
  _frames(nullptr),
- _flvContent()
+ _flvContent(),
+ _file(nullptr),
+  _urlFile()
 {
     uint32_t currentIndex = headerLength;
     _uid = readUnsigned16(&_rawData[currentIndex]);
@@ -103,16 +106,26 @@ std::string DefineVideoStreamTag::extensionFile() const
 	return ".flv";
 }
 
-void DefineVideoStreamTag::extract(std::ofstream& outputFile)
+void DefineVideoStreamTag::extract(QDataStream &outputStream)
 {
 	toFlv();
-	outputFile.write(_flvContent.data(), _flvContent.count());
+	outputStream.writeRawData(_flvContent.data(), _flvContent.count());
 }
 
-QByteArray DefineVideoStreamTag::getFlv()
+void DefineVideoStreamTag::createVideoFile(QDir& folder, QString& fileName)
 {
-	toFlv();
-	return _flvContent;
+	if (_file == nullptr)
+	{
+		QString filePath = folder.filePath(fileName+QString::fromStdString(extensionFile()));
+		_file = new QFile(filePath);
+		if (_file->open(QIODevice::WriteOnly))
+		{
+			QDataStream outStream(_file);
+			extract(outStream);
+			_file->close();
+			_urlFile = QUrl::fromLocalFile(_file->fileName());
+		}
+	}
 }
 
 void DefineVideoStreamTag::toFlv()

@@ -14,7 +14,7 @@ public:
 
 	void link(SWFFile* swfFile) override;
 
-	void extract(std::ofstream& outputFile) override;
+	void extract(QDataStream &outputStream) override;
 	QImage toQImage() const override;
 
 private:

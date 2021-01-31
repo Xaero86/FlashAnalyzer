@@ -6,7 +6,8 @@
 #include "imagetag.h"
 
 ImagePreview::ImagePreview(QWidget *parent)
-	: QWidget(parent)
+	: QWidget(parent),
+	  _imageIndex(0)
 {
 	setBackgroundRole(QPalette::Base);
 	setAutoFillBackground(true);
@@ -15,7 +16,7 @@ ImagePreview::ImagePreview(QWidget *parent)
 	setMinimumSize(200,200);
 }
 
-void ImagePreview::setTagImage(Tag* tag, const QString &name)
+void ImagePreview::setTagImage(Tag* tag, const QString &name, int index)
 {
 	_image = QImage();
 	if (tag == nullptr)
@@ -24,6 +25,7 @@ void ImagePreview::setTagImage(Tag* tag, const QString &name)
 	}
 	if (tag->isImage())
 	{
+		_imageIndex = index;
 		ImageTag* imageTag = dynamic_cast<ImageTag*>(tag);
 		_image = imageTag->toQImage();
 		if (!_image.isNull())
@@ -66,20 +68,14 @@ void ImagePreview::paintEvent(QPaintEvent * /* event */)
 
 void ImagePreview::keyPressEvent(QKeyEvent *event)
 {
-	if(event->key() == Qt::Key_Left)
-	{
-		emit leftPress();
-	}
-	else if(event->key() == Qt::Key_Right)
-	{
-		emit rightPress();
-	}
-	else if(event->key() == Qt::Key_Up)
-	{
-		emit upPress();
-	}
-	else if(event->key() == Qt::Key_Down)
-	{
-		emit downPress();
+	switch (event->key()) {
+	case Qt::Key_Left:
+	case Qt::Key_Up:
+		emit imageChanged(_imageIndex-1);
+		break;
+	case Qt::Key_Right:
+	case Qt::Key_Down:
+		emit imageChanged(_imageIndex+1);
+		break;
 	}
 }

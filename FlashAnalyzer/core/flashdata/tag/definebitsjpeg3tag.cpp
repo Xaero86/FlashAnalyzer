@@ -76,9 +76,9 @@ std::string DefineBitsJPEG3Tag::tagDescription() const
 	return description.str();
 }
 
-void DefineBitsJPEG3Tag::extract(std::ofstream& outputFile)
+void DefineBitsJPEG3Tag::extract(QDataStream &outputStream)
 {
-	outputFile.write(_imageData, _imageDataSize);
+	outputStream.writeRawData(_imageData, _imageDataSize);
 }
 
 QImage DefineBitsJPEG3Tag::toQImage() const

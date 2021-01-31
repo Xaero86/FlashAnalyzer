@@ -80,9 +80,9 @@ std::string DefineBitsJPEG4Tag::tagDescription() const
 	return description.str();
 }
 
-void DefineBitsJPEG4Tag::extract(std::ofstream& outputFile)
+void DefineBitsJPEG4Tag::extract(QDataStream &outputStream)
 {
-	outputFile.write(_imageData, _imageDataSize);
+	outputStream.writeRawData(_imageData, _imageDataSize);
 }
 
 QImage DefineBitsJPEG4Tag::toQImage() const

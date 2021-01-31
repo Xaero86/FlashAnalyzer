@@ -12,13 +12,10 @@ class ImagePreview : public QWidget
 public:
 	ImagePreview(QWidget *parent = nullptr);
 
-	void setTagImage(Tag* tag = nullptr, const QString &name = QString("Image preview"));
+	void setTagImage(Tag* tag = nullptr, const QString &name = QString("Image preview"), int index = 0);
 
 signals:
-	void leftPress();
-	void rightPress();
-	void upPress();
-	void downPress();
+	void imageChanged(int newIndex);
 
 protected:
 	void paintEvent(QPaintEvent *event);
@@ -26,6 +23,7 @@ protected:
 
 private:
 	QImage	        _image;
+	int             _imageIndex;
 };
 
 #endif // IMAGEPREVIEW_H

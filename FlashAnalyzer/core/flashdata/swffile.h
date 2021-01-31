@@ -27,7 +27,7 @@ public:
 
 	const char* data() const {return _data;}
 	uint32_t dataSize() const {return _dataSize;}
-    
+
 private:
     enum CompressType
     {

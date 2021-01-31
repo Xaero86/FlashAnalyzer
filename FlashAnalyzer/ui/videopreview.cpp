@@ -1,91 +1,170 @@
 #include "videopreview.h"
 
 #include <QHBoxLayout>
-#include <QBuffer>
-#include <QVideoFrame>
-
-#include "definevideostreamtag.h"
+#include <QVBoxLayout>
+#include <QStyle>
 
 VideoPreview::VideoPreview(QWidget *parent)
-	: QVideoWidget(parent),
-	  _playlistMode(true),
-	  _tag(nullptr)
+	: QWidget(parent)
 {
 	setBackgroundRole(QPalette::Base);
 	setAutoFillBackground(true);
 
+	_videoWidget = new QVideoWidget(this);
+	_videoWidget->setAspectRatioMode(Qt::KeepAspectRatio);
+
 	_mediaPlayer = new QMediaPlayer(nullptr, QMediaPlayer::VideoSurface);
-	_mediaPlayer->setVideoOutput(this);
+	_mediaPlayer->setVideoOutput(_videoWidget);
 	_mediaPlayer->setVolume(0);
 
-	setLayout(new QHBoxLayout);
-	setMinimumSize(200,200);
+	_mediaPlaylist = new QMediaPlaylist(_mediaPlayer);
+	_mediaPlaylist->setPlaybackMode(QMediaPlaylist::Loop);
+	_mediaPlayer->setPlaylist(_mediaPlaylist);
 
-	connect(_mediaPlayer, SIGNAL(error(QMediaPlayer::Error)), this, SLOT(handleError(QMediaPlayer::Error)));
-	connect(_mediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(handleMediaStateChanged(QMediaPlayer::MediaStatus)));
-	connect(this, SIGNAL(spacePress()), this, SLOT(playPause()));
+	_toolbar = new QWidget(this);
+	_toolbar->setGeometry(0,0,250,60);
+
+	_playButton = new QPushButton;
+	_playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+	_playButton->setFocusPolicy(Qt::NoFocus);
+	_nextButton = new QPushButton;
+	_nextButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
+	_nextButton->setFocusPolicy(Qt::NoFocus);
+	_prevButton = new QPushButton;
+	_prevButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
+	_prevButton->setFocusPolicy(Qt::NoFocus);
+
+	_loopCheckBox = new QCheckBox("&Loop");
+	_loopCheckBox->setChecked(true);
+	_loopCheckBox->setFocusPolicy(Qt::NoFocus);
+
+	_allRadio = new QRadioButton("&All");
+	_allRadio->setChecked(true);
+	_allRadio->setFocusPolicy(Qt::NoFocus);
+	_currentRadio = new QRadioButton("&Current only");
+	_currentRadio->setFocusPolicy(Qt::NoFocus);
+
+	QVBoxLayout* vRadioLayout = new QVBoxLayout;
+	vRadioLayout->addWidget(_allRadio);
+	vRadioLayout->addWidget(_currentRadio);
+
+	QHBoxLayout* hToolLayout = new QHBoxLayout();
+	hToolLayout->addWidget(_prevButton);
+	hToolLayout->addWidget(_playButton);
+	hToolLayout->addWidget(_nextButton);
+	hToolLayout->addStretch();
+	hToolLayout->addWidget(_loopCheckBox);
+	hToolLayout->addLayout(vRadioLayout);
+	_toolbar->setLayout(hToolLayout);
+	_toolbar->hide();
+
+	QHBoxLayout* hLayout = new QHBoxLayout(this);
+	hLayout->setContentsMargins(0,0,0,0);
+	hLayout->addWidget(_videoWidget);
+
+	setLayout(hLayout);
+	setMinimumSize(250,200);
+
+	connect(_mediaPlaylist, SIGNAL(currentIndexChanged(int)), this, SLOT(handleIndexChanged(int)));
+	connect(_mediaPlaylist, SIGNAL(currentMediaChanged(const QMediaContent &)), this, SLOT(handleMediaChanged(const QMediaContent &)));
+	connect(_mediaPlayer,   SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(handlePlayerStateChanged(QMediaPlayer::State)));
+	connect(_playButton,    SIGNAL(clicked()), this, SLOT(handlePlayPause()));
+	connect(_nextButton,    SIGNAL(clicked()), this, SLOT(nextVideo()));
+	connect(_prevButton,    SIGNAL(clicked()), this, SLOT(previousVideo()));
+	connect(_allRadio,      SIGNAL(clicked()), this, SLOT(handlePlaybackMode()));
+	connect(_currentRadio,  SIGNAL(clicked()), this, SLOT(handlePlaybackMode()));
+	connect(_loopCheckBox,  SIGNAL(clicked()), this, SLOT(handlePlaybackMode()));
 }
 
-void VideoPreview::setTagVideo(Tag* tag, const QString &name)
+void VideoPreview::clearPlaylist()
 {
-	_tag = tag;
-	if (tag == nullptr)
-	{
-		_mediaPlayer->setMedia(QMediaContent());
-		return;
-	}
-	if (tag->isVideo())
-	{
-		DefineVideoStreamTag* videoTag = dynamic_cast<DefineVideoStreamTag*>(tag);
-		if (!windowState().testFlag(Qt::WindowMaximized))
-		{
-			resize(videoTag->width(),videoTag->height());
-		}
-
-		setWindowFilePath(name);
-
-		QBuffer* buffer = new QBuffer(_mediaPlayer);
-		buffer->setData(videoTag->getFlv());
-		buffer->open(QIODevice::ReadOnly);
-		_mediaPlayer->setMedia(QMediaContent(),buffer);
-
-		if (!isHidden())
-		{
-			_mediaPlayer->play();
-		}
-	}
+	hide();
+	_mediaPlayer->stop();
+	_mediaPlaylist->clear();
 }
 
-void VideoPreview::handleError(QMediaPlayer::Error error)
+void VideoPreview::addVideo(int pos, const QMediaContent &video)
 {
-	qDebug() << "error=" << error;
+	_mediaPlaylist->insertMedia(pos, video);
 }
 
-void VideoPreview::handleMediaStateChanged(QMediaPlayer::MediaStatus status)
+void VideoPreview::selectVideo(int pos)
 {
-	if (status == QMediaPlayer::EndOfMedia)
-	{
-		if (_playlistMode)
-		{
-			emit rightPress();
-		}
-		else if (_tag != nullptr)
-		{
-			DefineVideoStreamTag* videoTag = dynamic_cast<DefineVideoStreamTag*>(_tag);
-			QBuffer *buffer = new QBuffer(_mediaPlayer);
-			buffer->setData(videoTag->getFlv());
-			buffer->open(QIODevice::ReadOnly);
+	_mediaPlaylist->setCurrentIndex(pos);
+}
 
-			_mediaPlayer->setMedia(QMediaContent(),buffer);
-			if (!isHidden())
-			{
-				_mediaPlayer->play();
-			}
-		}
+void VideoPreview::nextVideo()
+{
+	if (_mediaPlaylist->playbackMode() == QMediaPlaylist::CurrentItemInLoop)
+	{
+		_mediaPlaylist->setPlaybackMode(QMediaPlaylist::Loop);
+		_mediaPlaylist->next();
+		_mediaPlaylist->setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
+	}
+	else if (_mediaPlaylist->playbackMode() == QMediaPlaylist::CurrentItemOnce)
+	{
+		_mediaPlaylist->setPlaybackMode(QMediaPlaylist::Sequential);
+		_mediaPlaylist->next();
+		_mediaPlaylist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
+	}
+	else
+	{
+		_mediaPlaylist->next();
 	}
 }
 
-void VideoPreview::playPause()
+void VideoPreview::previousVideo()
+{
+	if (_mediaPlaylist->playbackMode() == QMediaPlaylist::CurrentItemInLoop)
+	{
+		_mediaPlaylist->setPlaybackMode(QMediaPlaylist::Loop);
+		_mediaPlaylist->previous();
+		_mediaPlaylist->setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
+	}
+	else if (_mediaPlaylist->playbackMode() == QMediaPlaylist::CurrentItemOnce)
+	{
+		_mediaPlaylist->setPlaybackMode(QMediaPlaylist::Sequential);
+		_mediaPlaylist->previous();
+		_mediaPlaylist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
+	}
+	else
+	{
+		_mediaPlaylist->previous();
+	}
+}
+
+void VideoPreview::handleIndexChanged(int position)
+{
+	emit videoChanged(position);
+}
+
+void VideoPreview::handleMediaChanged(const QMediaContent &content)
+{
+	if (!content.isNull())
+	{
+		setWindowFilePath(content.request().url().fileName());
+	}
+}
+
+void VideoPreview::handlePlayerStateChanged(QMediaPlayer::State state)
+{
+	switch (state) {
+	case QMediaPlayer::StoppedState:
+		_playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+		_videoWidget->hide();
+		break;
+	case QMediaPlayer::PlayingState:
+		_playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+		_videoWidget->show();
+		break;
+	case QMediaPlayer::PausedState:
+		_playButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+		_videoWidget->show();
+		break;
+	}
+}
+
+void VideoPreview::handlePlayPause()
 {
 	if (_mediaPlayer->state() == QMediaPlayer::PlayingState)
 	{
@@ -97,32 +176,56 @@ void VideoPreview::playPause()
 	}
 }
 
+void VideoPreview::handlePlaybackMode()
+{
+	if (_loopCheckBox->isChecked())
+	{
+		if (_allRadio->isChecked())
+		{
+			_mediaPlaylist->setPlaybackMode(QMediaPlaylist::Loop);
+		}
+		else
+		{
+			_mediaPlaylist->setPlaybackMode(QMediaPlaylist::CurrentItemInLoop);
+		}
+	}
+	else
+	{
+		if (_allRadio->isChecked())
+		{
+			_mediaPlaylist->setPlaybackMode(QMediaPlaylist::Sequential);
+		}
+		else
+		{
+			_mediaPlaylist->setPlaybackMode(QMediaPlaylist::CurrentItemOnce);
+		}
+	}
+}
+
+#include <QApplication>
+
 void VideoPreview::keyPressEvent(QKeyEvent *event)
 {
-	if (event->key() == Qt::Key_Left)
-	{
-		emit leftPress();
+	switch (event->key()) {
+	case Qt::Key_Left:
+	case Qt::Key_Up:
+		//if (QApplication::activeWindow() == this)
+		{
+			previousVideo();
+		}
+		break;
+	case Qt::Key_Right:
+	case Qt::Key_Down:
+		//if (QApplication::activeWindow() == this)
+		{
+			nextVideo();
+		}
+		break;
+	case Qt::Key_Space:
+		handlePlayPause();
+		break;
 	}
-	else if (event->key() == Qt::Key_Right)
-	{
-		emit rightPress();
-	}
-	else if (event->key() == Qt::Key_Up)
-	{
-		emit upPress();
-	}
-	else if (event->key() == Qt::Key_Down)
-	{
-		emit downPress();
-	}
-	else if (event->key() == Qt::Key_Space)
-	{
-		emit spacePress();
-	}
-	else if (event->key() == Qt::Key_M)
-	{
-		_playlistMode = !_playlistMode;
-	}
+	event->accept();
 }
 
 void VideoPreview::showEvent(QShowEvent *)
@@ -133,4 +236,21 @@ void VideoPreview::showEvent(QShowEvent *)
 void VideoPreview::hideEvent(QHideEvent *)
 {
 	_mediaPlayer->pause();
+}
+
+void VideoPreview::enterEvent(QEvent *)
+{
+	_toolbar->show();
+}
+
+void VideoPreview::leaveEvent(QEvent *)
+{
+	_toolbar->hide();
+}
+
+void VideoPreview::resizeEvent(QResizeEvent *)
+{
+	int w =_toolbar->width();
+	int h =_toolbar->height();
+	_toolbar->setGeometry((width()-w)/2,height()-h,w,h);
 }

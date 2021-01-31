@@ -25,6 +25,11 @@ public:
 	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
 	QModelIndex parent(const QModelIndex &child) const override;
 
+signals:
+	void newImage(Tag* tag, QString& name, int index);
+	void newVideo(Tag* tag, QString& name, int index);
+	void newSound(Tag* tag, QString& name, int index);
+
 private:
 	SWFFile*        _swfFile;
 	QList<Tag*>     _imageList;

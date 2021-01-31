@@ -15,6 +15,8 @@ ExtractableView::ExtractableView(QWidget *parent)
 	_contextMenu = new QMenu(this);
 	_actionExtract = new QAction("&Extract", this);
 	_contextMenu->addAction(_actionExtract);
+	_actionPreview = new QAction("&Preview", this);
+	_contextMenu->addAction(_actionPreview);
 
 	_saveDialog.setFileMode(QFileDialog::AnyFile);
 	_saveDialog.setAcceptMode(QFileDialog::AcceptSave);
@@ -24,7 +26,8 @@ ExtractableView::ExtractableView(QWidget *parent)
 	_saveAllDialog.setFileMode(QFileDialog::Directory);
 	_saveAllDialog.setAcceptMode(QFileDialog::AcceptSave);
 
-	connect(this, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(prepareMenu(QPoint)));
+	connect(this,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(prepareMenu(QPoint)));
+	connect(_actionPreview,SIGNAL(triggered()),this,SLOT(reqPreview()));
 	connect(_actionExtract,SIGNAL(triggered()),this,SLOT(handleExtract()));
 	connect(this,SIGNAL(doubleClicked(const QModelIndex &)),this,SLOT(reqPreview()));
 }
@@ -43,48 +46,34 @@ void ExtractableView::setDefaultUrl(QUrl& url)
 	}
 }
 
-void ExtractableView::selectNext()
+void ExtractableView::selectImage(int pos)
 {
-	QModelIndexList selecteds = selectedIndexes();
-
-	if (selecteds.size() == 1)
-	{
-		QModelIndex selected = selecteds.at(0);
-		if (!selected.isValid())
-		{
-			return;
-		}
-		if (!selected.parent().isValid())
-		{
-			return;
-		}
-		int row = selected.row();
-		int max = model()->rowCount(selected.parent());
-		QModelIndex nextIndex = selected.siblingAtRow((row+1)%max);
-		selectionModel()->select(nextIndex, QItemSelectionModel::ClearAndSelect);
-	}
+	QModelIndex images = selectionModel()->model()->index(0,0);
+	int max = selectionModel()->model()->rowCount(images);
+	int index = pos % max;
+	if (index < 0) index += max;
+	QModelIndex newSel = selectionModel()->model()->index(index,0,images);
+	selectionModel()->select(newSel, QItemSelectionModel::ClearAndSelect);
 }
 
-void ExtractableView::selectPrevious()
+void ExtractableView::selectVideo(int pos)
 {
-	QModelIndexList selecteds = selectedIndexes();
+	QModelIndex video = selectionModel()->model()->index(1,0);
+	int max = selectionModel()->model()->rowCount(video);
+	int index = pos % max;
+	if (index < 0) index += max;
+	QModelIndex newSel = selectionModel()->model()->index(index,0,video);
+	selectionModel()->select(newSel, QItemSelectionModel::ClearAndSelect);
+}
 
-	if (selecteds.size() == 1)
-	{
-		QModelIndex selected = selecteds.at(0);
-		if (!selected.isValid())
-		{
-			return;
-		}
-		if (!selected.parent().isValid())
-		{
-			return;
-		}
-		int row = selected.row();
-		int max = model()->rowCount(selected.parent());
-		QModelIndex previousIndex = selected.siblingAtRow((row==0)?(max-1):(row-1));
-		selectionModel()->select(previousIndex, QItemSelectionModel::ClearAndSelect);
-	}
+void ExtractableView::selectSound(int pos)
+{
+	QModelIndex sound = selectionModel()->model()->index(2,0);
+	int max = selectionModel()->model()->rowCount(sound);
+	int index = pos % max;
+	if (index < 0) index += max;
+	QModelIndex newSel = selectionModel()->model()->index(index,0,sound);
+	selectionModel()->select(newSel, QItemSelectionModel::ClearAndSelect);
 }
 
 void ExtractableView::selChanged()
@@ -102,7 +91,17 @@ void ExtractableView::selChanged()
 		if (tag != nullptr)
 		{
 			QString name = selected.data(Qt::DisplayRole).toString();
-			emit tagSelected(tag, name);
+			switch (selected.parent().row()) {
+			case 0:
+				emit imageSelected(tag, name, selected.row());
+				break;
+			case 1:
+				emit videoSelected(tag, name, selected.row());
+				break;
+			case 2:
+				emit soundSelected(tag, name, selected.row());
+				break;
+			}
 		}
 	}
 }
@@ -116,7 +115,17 @@ void ExtractableView::reqPreview()
 		QModelIndex selected = selecteds.at(0);
 		if (selected.isValid() && selected.parent().isValid())
 		{
-			emit doubleClick(selected.parent().row());
+			switch (selected.parent().row()) {
+			case 0:
+				emit imagePreview();
+				break;
+			case 1:
+				emit videoPreview();
+				break;
+			case 2:
+				emit soundPreview();
+				break;
+			}
 		}
 	}
 }
@@ -127,15 +136,18 @@ void ExtractableView::prepareMenu(const QPoint &pos)
 
 	if (element.isValid())
 	{
-		if (element.parent().isValid())
+		if (element.parent().isValid() && (element.parent().row() < 2))
 		{
 			_actionExtract->setText("&Extract");
+			_actionPreview->setVisible(true);
+			_contextMenu->popup(viewport()->mapToGlobal(pos));
 		}
-		else
+		else if ((element.row() < 2) && (model()->hasChildren(element)))
 		{
 			_actionExtract->setText("&Extract all");
+			_actionPreview->setVisible(false);
+			_contextMenu->popup(viewport()->mapToGlobal(pos));
 		}
-		_contextMenu->popup(viewport()->mapToGlobal(pos));
 	}
 }
 
@@ -212,8 +224,12 @@ void ExtractableView::extractTag(const QModelIndex& index, QString fileName)
 			name = index.data(Qt::DisplayRole).toString()+QString::fromStdString(extractable->extensionFile());
 		}
 		QString filePath = _lastUsedPath.toLocalFile() + "/" + name;
-		std::ofstream file;
-		file.open(filePath.toStdString().c_str(), std::fstream::binary);
-		extractable->extract(file);
+		QFile outputFile(filePath);
+
+		if (outputFile.open(QIODevice::WriteOnly))
+		{
+			QDataStream outStream(&outputFile);
+			extractable->extract(outStream);
+		}
 	}
 }

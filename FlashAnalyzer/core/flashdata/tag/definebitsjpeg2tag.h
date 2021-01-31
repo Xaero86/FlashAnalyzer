@@ -11,7 +11,7 @@ public:
 	std::string tagType() const override;
 	std::string tagDescription() const override;
 
-	void extract(std::ofstream &outputFile) override;
+	void extract(QDataStream& outputStream) override;
 	QImage toQImage() const override;
 };
 

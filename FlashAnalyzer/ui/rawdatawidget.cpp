@@ -19,8 +19,6 @@ void RawDataWidget::setData(const char* data, unsigned int size)
 	std::stringstream output;
 	unsigned int currentIndex = 0;
 
-	output << std::hex;
-
 	while (currentIndex < size)
 	{
 		output << std::hex << std::setw(2) << +((unsigned char)data[currentIndex]) << " ";

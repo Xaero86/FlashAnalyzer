@@ -7,6 +7,8 @@
 #include "extractabletag.h"
 
 #include <QByteArray>
+#include <QDir>
+#include <QUrl>
 
 class DefineVideoStreamTag : public DefinitionTag, public ExtractableTag
 {
@@ -22,7 +24,7 @@ public:
         UNKNOWN_FLAG
     };
 
-    DefineVideoStreamTag(const char* source, uint32_t headerLength, uint32_t dataLength);
+	DefineVideoStreamTag(const char* source, uint32_t headerLength, uint32_t dataLength);
     
     uint16_t numFrames() const {return _numFrames;}
     uint16_t width() const {return _width;}
@@ -36,8 +38,9 @@ public:
 	std::string tagDescription() const override;
 
 	std::string extensionFile() const override;
-	void extract(std::ofstream& outputFile) override;
-	QByteArray getFlv();
+	void extract(QDataStream &outputStream) override;
+	void createVideoFile(QDir& folder, QString &fileName);
+	const QUrl &getVideoFile() const {return _urlFile;}
     
 private:
     uint16_t        _numFrames;
@@ -49,6 +52,8 @@ private:
     VideoFrameTag** _frames;
 
 	QByteArray      _flvContent;
+	QFile*          _file;
+	QUrl            _urlFile;
 
 	void toFlv();
 };

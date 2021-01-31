@@ -25,7 +25,7 @@ std::string DefineSoundTag::extensionFile() const
 	return std::string();
 }
 
-void DefineSoundTag::extract(std::ofstream& /*outputFile*/)
+void DefineSoundTag::extract(QDataStream & /*outputFile*/)
 {
 	// TODO
 }
